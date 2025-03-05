@@ -34,6 +34,8 @@ public class Member extends BaseTimeEntity {
     @Column(name = "member_id")
     private Long id;
     @Column(nullable = false)
+    private Long authId;
+    @Column(nullable = false)
     private String name;
     @Column
     private String memberImageUrl;
