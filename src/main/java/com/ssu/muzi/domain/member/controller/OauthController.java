@@ -37,7 +37,7 @@ public class OauthController {
     }
 
     // 리프레시 토큰으로 액세스토큰 재발급 받는 로직
-    @PostMapping("/token/refresh")
+    @PostMapping("/login/token/refresh")
     @Operation(summary = "액세스토큰 재발급 API", description = "리프레시 토큰으로 액세스토큰을 재발급 받는 API입니다.")
     public ResultResponse<OauthResponse.RefreshTokenResponse> tokenRefresh(HttpServletRequest request) { //request: 클라이언트가 서버에 보낸 HTTP 요청에 포함된 쿠키를 가져오기 위함
         return ResultResponse.of(REFRESH_TOKEN, oauthService.tokenRefresh(request));

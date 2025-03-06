@@ -47,6 +47,8 @@ public class Member extends BaseTimeEntity {
     private String refreshToken;     // Refresh Token
     @Column
     private String accessToken;      // Access Token
+    @Column
+    private String email;      // Access Token
 
     @OneToMany(mappedBy = "member")
     @Builder.Default

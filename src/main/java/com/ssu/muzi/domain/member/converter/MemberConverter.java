@@ -1,5 +1,6 @@
 package com.ssu.muzi.domain.member.converter;
 
+import com.ssu.muzi.domain.member.dto.MemberResponse;
 import com.ssu.muzi.domain.member.dto.OauthResponse;
 import com.ssu.muzi.domain.member.entity.Member;
 import org.springframework.stereotype.Component;
@@ -28,6 +29,17 @@ public class MemberConverter {
     // 회원가입 여부 체크
     public OauthResponse.CheckMemberRegistration toCheckMemberRegistration(boolean isRegistered) {
         return new OauthResponse.CheckMemberRegistration(isRegistered);
+    }
+
+    // 멤버 정보를 반환
+    public MemberResponse.MemberInfo toMemberInfo(Member member) {
+        return MemberResponse.MemberInfo.builder()
+                .authId(member.getAuthId())
+                .memberId(member.getId())
+                .name(member.getName())
+                .memberImageUrl(member.getMemberImageUrl())
+                .onlyWifi(member.getOnlyWifi())
+                .build();
     }
 
 

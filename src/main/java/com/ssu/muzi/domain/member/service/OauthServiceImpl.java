@@ -69,19 +69,6 @@ public class OauthServiceImpl implements OauthService {
     }
 
     @Override
-    public OauthResponse.KakaoInfo getMyInfo() {
-        // SecurityContext에서 현재 로그인된 사용자의 ID를 추출
-        final long authId = SecurityUtil.getCurrentUserId();
-
-        //user의 authId를 사용하여 데이터베이스에서 해당 사용자의 정보를 조회
-        Member member = findMemberByAuthId(authId);
-        if(member == null) {
-            throw new BusinessException(MEMBER_NOT_FOUND);
-        }
-        return memberConverter.toLoginUserInfo(member);
-    }
-
-    @Override
     public OauthResponse.CheckMemberRegistration checkRegistration(OauthRequest.LoginRequest request) {
         boolean isRegistered = memberRepository.existsByAuthId(request.getAuthId());
         if (!isRegistered) {
@@ -93,7 +80,7 @@ public class OauthServiceImpl implements OauthService {
     @Override
     //카카오 로그인 로직
     public String loginWithKakao(String accessToken, HttpServletResponse response) {
-        //액세스 토큰으로 사용자 정보 가져오기
+        //액세스 토큰으로 사용자 정보 가져오고, 없는 사용자면 추가/있는 사용자면 갱신
         OauthResponse.KakaoInfo kakaoInfo = kakaoOauthService.getUserProfileByToken(accessToken);
         //가져온 사용자 정보를 바탕으로 Access Token과 Refresh Token을 생성하여 반환
         return getTokens(kakaoInfo.getAuthId(), response);
@@ -138,11 +125,4 @@ public class OauthServiceImpl implements OauthService {
         // 유효한 Refresh Token을 기반으로 새로운 Access Token을 생성하여 반환
         return jwtTokenService.createAccessToken(member.getAuthId().toString());
     }
-
-    @Override
-    public Member findMemberByAuthId(Long authId) {
-        return memberRepository.findByAuthId(authId)
-                .orElseThrow(() -> new BusinessException(MEMBER_NOT_FOUND_BY_AUTH_ID));
-    }
-
 }
