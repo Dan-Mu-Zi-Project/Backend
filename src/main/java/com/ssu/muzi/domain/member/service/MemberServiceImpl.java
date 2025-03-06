@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 
+import static com.ssu.muzi.global.error.code.MemberErrorCode.MEMBER_NAME_BLANK;
 import static com.ssu.muzi.global.error.code.MemberErrorCode.MEMBER_NOT_FOUND_BY_MEMBER_ID;
 
 @Service
@@ -24,6 +25,7 @@ public class MemberServiceImpl implements MemberService {
 
     //회원 정보 조회
     @Override
+    @Transactional(readOnly = true)
     public MemberResponse.MemberInfo getMyInfo() {
         // SecurityContext에서 현재 로그인된 사용자의 멤버 ID를 추출
         final long memberId = SecurityUtil.getCurrentUserId();
@@ -32,6 +34,22 @@ public class MemberServiceImpl implements MemberService {
         Member member = findMemberByMemberId(memberId);
         //컨버터로 변환
         return memberConverter.toMemberInfo(member);
+    }
+
+    @Transactional
+    @Override
+    public MemberResponse.MemberId setNickName(Member member, String name) {
+
+        // 이름 필드가 비어 있다면 오류
+        if (name == null || name.isBlank()) {
+            throw new BusinessException(MEMBER_NAME_BLANK);
+        }
+
+        // 닉네임을 설정하고 db에 저장
+        member.setName(name);
+        memberRepository.save(member);
+
+        return memberConverter.toMemberId(member);
     }
 
     public Member findMemberByMemberId(Long memberId) {

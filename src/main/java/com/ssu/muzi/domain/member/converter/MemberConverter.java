@@ -43,5 +43,13 @@ public class MemberConverter {
                 .build();
     }
 
+    // member Id만 반환
+    public MemberResponse.MemberId toMemberId(Member member) {
+        return MemberResponse.MemberId
+                .builder()
+                .memberId(member.getId())
+                .build();
+    }
+
 
 }
