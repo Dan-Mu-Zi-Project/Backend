@@ -47,10 +47,11 @@ public class KakaoOauthService {
         // 가져온 사용자 정보를 기반으로 KakaoInfoDto 객체를 생성
         KakaoInfoResponse kakaoInfoDto = new KakaoInfoResponse(userAttributesByToken);
 
-        // KakaoInfoDto 객체에서 필요한 정보를 추출하여 UserDto 객체를 생성
+        // KakaoInfoDto 객체에서 필요한 정보를 추출하여 kakaoinfo 객체를 생성
         OauthResponse.KakaoInfo kakaoInfo = OauthResponse.KakaoInfo.builder()
                 .authId(kakaoInfoDto.getAuthId()) // 카카오 사용자 authID를 UserDto의 authID로 설정
                 .name(kakaoInfoDto.getName())
+                .email(kakaoInfoDto.getEmail())
                 .build();
 
         // 데이터베이스에서 해당 사용자 ID로 사용자를 조회
@@ -59,6 +60,7 @@ public class KakaoOauthService {
         if (existingUser != null) {
             // 이미 존재하면 업데이트
             existingUser.setName(kakaoInfo.getName());
+            existingUser.setEmail(kakaoInfo.getEmail());
             memberRepository.save(existingUser);
         } else {
             // 존재하지 않으면 새로운 사용자로 저장

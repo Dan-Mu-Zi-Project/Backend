@@ -13,6 +13,7 @@ public class MemberConverter {
         return Member.builder()
                 .authId(kakaoInfo.getAuthId()) // UserDTO의 authId를 User 엔티티의 authId로 설정
                 .name(kakaoInfo.getName()) //카카오톡 이름
+                .email(kakaoInfo.getEmail())
                 .refreshToken(kakaoInfo.getRefreshToken()) // UserDTO의 리프레시 토큰을 User 엔티티의 리프레시 토큰으로 설정
                 .build();
     }
