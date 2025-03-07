@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import static com.ssu.muzi.global.result.code.MemberResultCode.MYPAGE_INFO;
+import static com.ssu.muzi.global.result.code.MemberResultCode.SET_IMAGE;
 import static com.ssu.muzi.global.result.code.MemberResultCode.SET_NICKNAME;
 
 @RestController
@@ -41,6 +42,14 @@ public class MemberController {
     public ResultResponse<MemberResponse.MemberId> setName(@LoginMember Member member,
                                                                @RequestParam String name) {
         return ResultResponse.of(SET_NICKNAME, memberService.setNickName(member, name));
+    }
+
+    // 내 정보 수정 (이름 수정) API
+    @PutMapping("/my/image")
+    @Operation(summary = "내 정보(프로필 사진) 수정 API", description = "유저 프로필 사진을 변경하는 API입니다.")
+    public ResultResponse<MemberResponse.MemberId> setImage(@LoginMember Member member,
+                                                           @RequestParam String memberImageUrl) {
+        return ResultResponse.of(SET_IMAGE, memberService.setMemberImageUrl(member, memberImageUrl));
     }
 
 }

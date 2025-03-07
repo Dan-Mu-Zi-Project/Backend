@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 
+import static com.ssu.muzi.global.error.code.MemberErrorCode.MEMBER_IMAGE_BLANK;
 import static com.ssu.muzi.global.error.code.MemberErrorCode.MEMBER_NAME_BLANK;
 import static com.ssu.muzi.global.error.code.MemberErrorCode.MEMBER_NOT_FOUND_BY_MEMBER_ID;
 
@@ -36,7 +37,7 @@ public class MemberServiceImpl implements MemberService {
         return memberConverter.toMemberInfo(member);
     }
 
-    @Transactional
+    //회원 정보 수정
     @Override
     public MemberResponse.MemberId setNickName(Member member, String name) {
 
@@ -47,6 +48,22 @@ public class MemberServiceImpl implements MemberService {
 
         // 닉네임을 설정하고 db에 저장
         member.setName(name);
+        memberRepository.save(member);
+
+        return memberConverter.toMemberId(member);
+    }
+
+    //회원 정보 수정 - 이미지
+    @Override
+    public MemberResponse.MemberId setMemberImageUrl(Member member, String memberImageUrl) {
+
+        // 이미지 필드가 비어 있다면 오류
+        if (memberImageUrl == null || memberImageUrl.isBlank()) {
+            throw new BusinessException(MEMBER_IMAGE_BLANK);
+        }
+
+        // 사진을 설정하고 db에 저장
+        member.setMemberImageUrl(memberImageUrl);
         memberRepository.save(member);
 
         return memberConverter.toMemberId(member);

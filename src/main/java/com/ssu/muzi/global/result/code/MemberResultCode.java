@@ -12,6 +12,7 @@ public enum MemberResultCode implements ResultCode {
     CHECK_MEMBER_REGISTRATION(200, "SM002", "해당 정보에 대응하는 회원의 가입 여부를 성공적으로 조회하였습니다."),
     MYPAGE_INFO(200, "SM003", "내 정보를 성공적으로 조회하였습니다."),
     SET_NICKNAME(200, "SM004", "성공적으로 이름을 수정하였습니다."),
+    SET_IMAGE(200, "SM005", "성공적으로 프로필 사진을 수정하였습니다."),
     ;
     private final int status;
     private final String code;

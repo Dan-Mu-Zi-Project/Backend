@@ -6,4 +6,5 @@ import com.ssu.muzi.domain.member.entity.Member;
 public interface MemberService {
     MemberResponse.MemberInfo getMyInfo();
     MemberResponse.MemberId setNickName(Member member, String name);
+    MemberResponse.MemberId setMemberImageUrl(Member member, String memberImageUrl);
 }
