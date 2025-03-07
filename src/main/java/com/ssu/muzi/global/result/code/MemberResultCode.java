@@ -13,6 +13,7 @@ public enum MemberResultCode implements ResultCode {
     MYPAGE_INFO(200, "SM003", "내 정보를 성공적으로 조회하였습니다."),
     SET_NICKNAME(200, "SM004", "성공적으로 이름을 수정하였습니다."),
     SET_IMAGE(200, "SM005", "성공적으로 프로필 사진을 수정하였습니다."),
+    SET_WIFI(200, "SM006", "성공적으로 와이파이 다운로드 여부를 변경했습니다."),
     ;
     private final int status;
     private final String code;

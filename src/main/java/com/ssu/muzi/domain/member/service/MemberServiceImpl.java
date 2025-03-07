@@ -69,6 +69,15 @@ public class MemberServiceImpl implements MemberService {
         return memberConverter.toMemberId(member);
     }
 
+    //회원 정보 수정 - 와이파이 여부
+    @Override
+    public MemberResponse.MemberId setWifi(Member member, Boolean onlyWifi) {
+        member.setOnlyWifi(onlyWifi);
+        memberRepository.save(member);
+
+        return memberConverter.toMemberId(member);
+    }
+
     public Member findMemberByMemberId(Long memberId) {
         return memberRepository.findById(memberId)
                 .orElseThrow(() -> new BusinessException(MEMBER_NOT_FOUND_BY_MEMBER_ID));

@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import static com.ssu.muzi.global.result.code.MemberResultCode.MYPAGE_INFO;
 import static com.ssu.muzi.global.result.code.MemberResultCode.SET_IMAGE;
 import static com.ssu.muzi.global.result.code.MemberResultCode.SET_NICKNAME;
+import static com.ssu.muzi.global.result.code.MemberResultCode.SET_WIFI;
 
 @RestController
 @RequestMapping("/members")
@@ -48,8 +49,16 @@ public class MemberController {
     @PutMapping("/my/image")
     @Operation(summary = "내 정보(프로필 사진) 수정 API", description = "유저 프로필 사진을 변경하는 API입니다.")
     public ResultResponse<MemberResponse.MemberId> setImage(@LoginMember Member member,
-                                                           @RequestParam String memberImageUrl) {
+                                                            @RequestParam String memberImageUrl) {
         return ResultResponse.of(SET_IMAGE, memberService.setMemberImageUrl(member, memberImageUrl));
+    }
+
+    // 내 정보 수정 (wifi 여부) API
+    @PutMapping("/my/wifi")
+    @Operation(summary = "내 정보(wifi 여부) 수정 API", description = "유저가 wifi에서만 다운로드 여부를 설정하는 API 입니다.")
+    public ResultResponse<MemberResponse.MemberId> setWifi(@LoginMember Member member,
+                                                           @RequestParam Boolean onlyWifi) {
+        return ResultResponse.of(SET_WIFI, memberService.setWifi(member, onlyWifi));
     }
 
 }
