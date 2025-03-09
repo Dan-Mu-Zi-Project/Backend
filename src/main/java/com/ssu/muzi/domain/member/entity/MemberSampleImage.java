@@ -8,6 +8,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
@@ -33,6 +34,11 @@ public class MemberSampleImage extends BaseTimeEntity {
     private Long id;
     @Column(name = "image_url")
     private String imageUrl;
+    @Column(name = "angle_type")
+    private AngleType angleType;
+    @Lob //대용량 문자 컬럼
+    @Column(name = "face_vector", columnDefinition = "TEXT")
+    private String faceVector;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
