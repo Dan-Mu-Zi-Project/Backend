@@ -20,7 +20,6 @@ public class MuziApplication {
 		SpringApplication.run(MuziApplication.class, args);
 	}
 
-	//.
 	@PostConstruct
 	public void setTimeZone() {
 		TimeZone.setDefault(TimeZone.getTimeZone("Asia/Seoul"));
