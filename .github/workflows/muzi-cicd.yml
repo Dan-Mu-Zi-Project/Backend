@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - main #브랜치명
+  pull_request:
+    branches: [ master ]  # master branch로 pull request될 때 실행됩니다.
 
 # 본인이 설정한 값을 여기서 채워넣는다.
 env:
