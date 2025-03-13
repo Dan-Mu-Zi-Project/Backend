@@ -65,6 +65,10 @@ public class KakaoOauthService {
         } else {
             // 존재하지 않으면 새로운 사용자로 저장
             Member newUser = memberConverter.toKakaoUserEntity(kakaoInfo);
+            // 로그인 시, 멤버 정보의 최초 기본값을 설정
+            newUser.setOnlyWifi(false);
+            newUser.setIsFaceCaptured(false);
+            newUser.setMemberImageUrl("s3://muzi-photo/memberImage/basicMemberImage.png");
             memberRepository.save(newUser);
         }
 

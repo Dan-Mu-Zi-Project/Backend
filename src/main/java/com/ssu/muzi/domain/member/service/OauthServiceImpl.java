@@ -98,8 +98,9 @@ public class OauthServiceImpl implements OauthService {
         Member member = memberRepository.findByAuthId(id)
                 .orElseThrow(() -> new BusinessException(MEMBER_NOT_FOUND));
 
-        // 현재 사용자 정보에 새로운 refresh token 추가
+        // 현재 사용자 정보에 새로운 refresh token, access token을 추가
         member.setRefreshToken(refreshToken);
+        member.setAccessToken(accessToken);
 
         // 사용자 정보를 DB에 저장 (업데이트)
         memberRepository.save(member);

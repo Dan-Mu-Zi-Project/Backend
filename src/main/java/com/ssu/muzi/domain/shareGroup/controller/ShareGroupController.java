@@ -34,7 +34,7 @@ public class ShareGroupController {
                                                                               @LoginMember Member member) {
         ShareGroup shareGroup = shareGroupService.createShareGroup(request, member);
         return ResultResponse.of(ShareGroupResultCode.CREATE_SHARE_GROUP,
-                shareGroupConverter.toShareGroupInvitationInfo(shareGroup));
+                shareGroupConverter.toShareGroupInvitationInfo(shareGroup, member));
     }
 
 }
