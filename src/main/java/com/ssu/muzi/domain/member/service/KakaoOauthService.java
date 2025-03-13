@@ -68,7 +68,7 @@ public class KakaoOauthService {
             // 로그인 시, 멤버 정보의 최초 기본값을 설정
             newUser.setOnlyWifi(false);
             newUser.setIsFaceCaptured(false);
-            newUser.setMemberImageUrl("s3://muzi-photo/memberImage/basicMemberImage.png");
+            newUser.setMemberImageUrl("https://muzi-photo.s3.ap-northeast-2.amazonaws.com/memberImage/basicMemberImage.png");
             memberRepository.save(newUser);
         }
 
