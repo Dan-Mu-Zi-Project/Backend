@@ -57,8 +57,11 @@ public class ShareGroup extends BaseTimeEntity {
     @Builder.Default
     private List<Profile> profileList = new ArrayList<>();
 
-//    public void delete() {
-//        super.delete();
-//    }
 
+    public void addProfile(Profile profile) {
+        if (this.profileList == null) {
+            this.profileList = new ArrayList<>();
+        }
+        this.profileList.add(profile);
+    }
 }
