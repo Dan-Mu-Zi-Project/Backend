@@ -70,7 +70,10 @@ public class ShareGroupServiceImpl implements ShareGroupService {
         // 7. Profile 저장
         profileRepository.save(profile);
 
-        // 8. 레포지토리에 저장
+        // 8. 그룹 정보에 내 프로필 추가
+        newShareGroup.addProfile(profile);
+
+        // 9. 그룹을 레포지토리에 저장
         return shareGroupRepository.save(newShareGroup);
     }
 
@@ -123,5 +126,6 @@ public class ShareGroupServiceImpl implements ShareGroupService {
         return shareGroupRepository.findById(shareGroupId)
                 .orElseThrow(() -> new BusinessException(SHARE_GROUP_NOT_FOUND));
     }
+
 
 }
