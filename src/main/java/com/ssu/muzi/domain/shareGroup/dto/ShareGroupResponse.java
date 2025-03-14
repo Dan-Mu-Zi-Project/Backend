@@ -35,6 +35,16 @@ public abstract class ShareGroupResponse {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
+    public static class JoinInfo {
+        private Long shareGroupId;
+        private Long profileId;
+        private LocalDateTime joinedAt;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class ShareGroupId {
         private Long shareGroupId;
     }

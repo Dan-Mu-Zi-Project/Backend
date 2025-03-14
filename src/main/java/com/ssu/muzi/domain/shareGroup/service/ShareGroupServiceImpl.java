@@ -23,7 +23,9 @@ import java.util.UUID;
 
 import static com.ssu.muzi.global.error.code.JwtErrorCode.MEMBER_NOT_FOUND;
 import static com.ssu.muzi.global.error.code.ShareGroupErrorCode.ALREADY_EXISTS_PROGRESSING_GROUP;
+import static com.ssu.muzi.global.error.code.ShareGroupErrorCode.ALREADY_JOINED_GROUP;
 import static com.ssu.muzi.global.error.code.ShareGroupErrorCode.ALREADY_STARTED_TRAVEL;
+import static com.ssu.muzi.global.error.code.ShareGroupErrorCode.ALREADY_STARTED_TRAVEL_NOT_JOIN;
 import static com.ssu.muzi.global.error.code.ShareGroupErrorCode.INVALID_DATE_MODIFICATION;
 import static com.ssu.muzi.global.error.code.ShareGroupErrorCode.SHARE_GROUP_NOT_FOUND;
 import static com.ssu.muzi.global.error.code.ShareGroupErrorCode.STARTEDAT_AFTER_ENDEDAT;
@@ -115,6 +117,36 @@ public class ShareGroupServiceImpl implements ShareGroupService {
         return shareGroupRepository.save(shareGroup);
     }
 
+    @Override
+    public Profile joinShareGroup(Long shareGroupId, Member member) {
+
+        // 1. 해당 공유 그룹 조회
+        ShareGroup shareGroup = findShareGroup(shareGroupId);
+
+        // 2. 먼저, 이미 그룹에 참여 중인 멤버인지 확인 (중복 가입 방지)
+        if (doesProfileExist(shareGroupId, member.getId())) {
+            throw new BusinessException(ALREADY_JOINED_GROUP);
+        }
+
+        // 3. 여행 날짜가 이미 지나버린 경우 참여 불가
+        LocalDateTime now = LocalDateTime.now();
+        if (!now.isBefore(shareGroup.getStartedAt())) {
+            throw new BusinessException(ALREADY_STARTED_TRAVEL_NOT_JOIN);
+        }
+
+        // 4. 여행일정 수정 시, 내 그룹에 여행기간이 겹치는 그룹이 이미 존재하는지 검증
+        validateTravelPeriodForMember(shareGroup.getStartedAt(), shareGroup.getEndedAt(), member);
+
+        // 5. 가입하지 않은 사용자라면, 새로운 Profile 생성 - 참여자 역할로
+        Profile profile = profileConverter.toProfileEntity(member, shareGroup);
+        profile.setRole(Role.PARTICIPANT);
+
+        // 6. Profile 저장
+        profileRepository.save(profile);
+
+        return profile;  // 새로 생성된 프로필 반환
+    }
+
     // 그룹 생성시!! 기간이 겹치는 그룹이 이미 존재하는지 확인하는 메소드 - 내가 참여한 그룹 안에서만 안겹치면 됨
     private void validateTravelPeriodForMember(LocalDateTime startedAt, LocalDateTime endedAt, Member member) {
         // 내가 참여한 그룹 목록을 조회
@@ -149,5 +181,7 @@ public class ShareGroupServiceImpl implements ShareGroupService {
                 .orElseThrow(() -> new BusinessException(SHARE_GROUP_NOT_FOUND));
     }
 
-
+    private boolean doesProfileExist(Long shareGroupId, Long memberId) {
+        return profileRepository.existsByShareGroupIdAndMemberId(shareGroupId, memberId);
+    }
 }

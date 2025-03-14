@@ -4,6 +4,7 @@ import com.ssu.muzi.domain.member.entity.Member;
 import com.ssu.muzi.domain.shareGroup.dto.ProfileResponse;
 import com.ssu.muzi.domain.shareGroup.dto.ShareGroupRequest;
 import com.ssu.muzi.domain.shareGroup.dto.ShareGroupResponse;
+import com.ssu.muzi.domain.shareGroup.entity.Profile;
 import com.ssu.muzi.domain.shareGroup.entity.ShareGroup;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -65,6 +66,16 @@ public class ShareGroupConverter {
                 // 참여자 목록
                 .participantInfoList(participantInfoList)
                 .createdAt(shareGroup.getCreatedAt())
+                .build();
+    }
+
+    // 그룹 가입 시
+    public ShareGroupResponse.JoinInfo toShareGroupJoinInfo(Profile profile) {
+
+        return ShareGroupResponse.JoinInfo.builder()
+                .shareGroupId(profile.getShareGroup().getId())
+                .profileId(profile.getId())
+                .joinedAt(profile.getJoinedAt())
                 .build();
     }
 
