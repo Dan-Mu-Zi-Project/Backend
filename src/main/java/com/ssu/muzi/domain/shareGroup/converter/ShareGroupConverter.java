@@ -23,6 +23,8 @@ public class ShareGroupConverter {
                 .place(request.getPlace())
                 .startedAt(request.getStartedAt())
                 .endedAt(request.getEndedAt())
+                .groupColor("#FFF4CD")
+                .groupImageUrl("https://muzi-photo.s3.ap-northeast-2.amazonaws.com/groupImage/basicGroupImage.png")
                 .build();
     }
 

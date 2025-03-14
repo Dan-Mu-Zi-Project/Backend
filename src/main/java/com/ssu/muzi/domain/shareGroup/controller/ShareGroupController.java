@@ -37,4 +37,6 @@ public class ShareGroupController {
                 shareGroupConverter.toShareGroupInvitationInfo(shareGroup, member));
     }
 
+
+
 }
