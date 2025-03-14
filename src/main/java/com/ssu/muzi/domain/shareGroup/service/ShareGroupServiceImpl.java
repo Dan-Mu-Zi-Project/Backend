@@ -54,6 +54,12 @@ public class ShareGroupServiceImpl implements ShareGroupService {
             throw new BusinessException(STARTEDAT_AFTER_ENDEDAT);
         }
 
+        // 4. 현재 날짜 이전으로 시작/종료 날짜 생성 불가
+        LocalDateTime now = LocalDateTime.now();
+        if (request.getStartedAt().isBefore(now) || request.getEndedAt().isBefore(now)) {
+            throw new BusinessException(INVALID_DATE_MODIFICATION);
+        }
+
         // 3. 그룹 생성시, 여행기간이 겹치는 그룹이 이미 존재하는지 검증
         validateTravelPeriodForMember(request.getStartedAt(), request.getEndedAt(), member);
 
@@ -88,8 +94,8 @@ public class ShareGroupServiceImpl implements ShareGroupService {
             throw new BusinessException(STARTEDAT_AFTER_ENDEDAT);
         }
 
-        // 2. 여행일정 수정 시, 여행기간이 겹치는 그룹이 이미 존재하는지 검증
-        validateTravelPeriodForMember(request.getStartedAt(), request.getEndedAt(), member);
+        // 2. 여행일정 수정 시, 여행기간이 겹치는 그룹이 이미 존재하는지 검증 (현재 수정하려는 그룹 제외)
+        validateTravelPeriodForMember(request.getStartedAt(), request.getEndedAt(), member, shareGroupId);
 
         // 3. 이미 여행 시작 날짜가 지났다면 업데이트 불가
         LocalDateTime now = LocalDateTime.now();
@@ -109,13 +115,29 @@ public class ShareGroupServiceImpl implements ShareGroupService {
         return shareGroupRepository.save(shareGroup);
     }
 
-    // 파라미터로 들어온 여행 기간에 대해, 기간이 겹치는 그룹이 이미 존재하는지 확인하는 메소드 - 근데 내가 참여한 그룹 안에서여야 하는데
+    // 그룹 생성시!! 기간이 겹치는 그룹이 이미 존재하는지 확인하는 메소드 - 내가 참여한 그룹 안에서만 안겹치면 됨
     private void validateTravelPeriodForMember(LocalDateTime startedAt, LocalDateTime endedAt, Member member) {
         // 내가 참여한 그룹 목록을 조회
         List<ShareGroup> myGroups = shareGroupRepository.findByMemberId(member.getId());
 
         // 각 그룹의 여행 기간과 요청된 기간이 겹치는지 체크
         for (ShareGroup group : myGroups) {
+            if (group.getStartedAt().isBefore(endedAt) && group.getEndedAt().isAfter(startedAt)) {
+                throw new BusinessException(ALREADY_EXISTS_PROGRESSING_GROUP);
+            }
+        }
+    }
+
+    // 그룹 수정시!! 기간이 겹치는 그룹이 이미 존재하는지 확인하는 메소드 - 현재 수정하려는 그룹은 제외하고 확인
+    private void validateTravelPeriodForMember(LocalDateTime startedAt, LocalDateTime endedAt, Member member, Long excludeGroupId) {
+        // 내가 참여한 그룹 목록 조회
+        List<ShareGroup> myGroups = shareGroupRepository.findByMemberId(member.getId());
+        for (ShareGroup group : myGroups) {
+            // 수정 중인 그룹은 건너뜁니다.
+            if (group.getId().equals(excludeGroupId)) {
+                continue;
+            }
+            // 여행 기간이 겹치는지 확인 (겹치면 예외 발생)
             if (group.getStartedAt().isBefore(endedAt) && group.getEndedAt().isAfter(startedAt)) {
                 throw new BusinessException(ALREADY_EXISTS_PROGRESSING_GROUP);
             }
