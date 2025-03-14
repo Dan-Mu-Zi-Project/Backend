@@ -4,6 +4,7 @@ import com.ssu.muzi.domain.member.entity.Member;
 import com.ssu.muzi.domain.shareGroup.converter.ShareGroupConverter;
 import com.ssu.muzi.domain.shareGroup.dto.ShareGroupRequest;
 import com.ssu.muzi.domain.shareGroup.dto.ShareGroupResponse;
+import com.ssu.muzi.domain.shareGroup.entity.Profile;
 import com.ssu.muzi.domain.shareGroup.entity.ShareGroup;
 import com.ssu.muzi.domain.shareGroup.service.ShareGroupService;
 import com.ssu.muzi.global.result.ResultResponse;
@@ -49,4 +50,16 @@ public class ShareGroupController {
                 shareGroupConverter.toShareGroupId(shareGroup));
     }
 
+    @PostMapping("{shareGroupId}/join")
+    @Operation(summary = "공유그룹 참여 API", description = "특정 공유그룹에 참여하는 API입니다.")
+    @Parameters(value = {
+            @Parameter(name = "shareGroupId", description = "특정 공유그룹 id를 입력해 주세요.")
+    })
+    public ResultResponse<ShareGroupResponse.JoinInfo> joinShareGroup(@PathVariable(name = "shareGroupId") Long shareGroupId,
+                                                                      @LoginMember Member member) {
+        // 그룹 id와 member정보를 바탕으로 프로필 생성
+        Profile profile = shareGroupService.joinShareGroup(shareGroupId, member);
+        return ResultResponse.of(ShareGroupResultCode.JOIN_SHARE_GROUP,
+                shareGroupConverter.toShareGroupJoinInfo(profile));
+    }
 }

@@ -12,7 +12,8 @@ public enum ShareGroupErrorCode implements ErrorCode {
     SHARE_GROUP_NOT_FOUND(404, "ES002", "해당 id에 해당하는 공유그룹을 찾을 수 없습니다."),
     ALREADY_STARTED_TRAVEL(404, "ES003", "이미 여행이 시작됐기 때문에 여행 날짜를 변경할 수 없어요."),
     INVALID_DATE_MODIFICATION(404, "ES004", "시작 날짜나 종료 날짜는 현재 날짜 이전으로 설정될 수 없어요."),
-
+    ALREADY_JOINED_GROUP(404, "ES005", "이미 참여한 그룹입니다."),
+    ALREADY_STARTED_TRAVEL_NOT_JOIN(404, "ES006", "이미 여행이 시작되어 참여할 수 없어요."),
     ;
 
     private final int status;
