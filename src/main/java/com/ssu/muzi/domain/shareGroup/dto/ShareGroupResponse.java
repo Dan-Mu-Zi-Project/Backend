@@ -30,4 +30,12 @@ public abstract class ShareGroupResponse {
         @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
         private LocalDateTime createdAt;
     }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ShareGroupId {
+        private Long shareGroupId;
+    }
 }

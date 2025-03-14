@@ -28,6 +28,17 @@ public class ShareGroupConverter {
                 .build();
     }
 
+    // 업데이트 요청 받은 그룹을 엔티티로 변환
+    public ShareGroup updateShareGroupEntity(ShareGroup shareGroup, ShareGroupRequest.UpdateShareGroupRequest request) {
+        shareGroup.setGroupColor(request.getGroupColor());
+        shareGroup.setGroupName(request.getGroupName());
+        shareGroup.setDescription(request.getDescription());
+        shareGroup.setPlace(request.getPlace());
+        shareGroup.setStartedAt(request.getStartedAt());
+        shareGroup.setEndedAt(request.getEndedAt());
+        return shareGroup;
+    }
+
     // 초대장 정보 화면을 반환하는 DTO (참여자 목록, 오너의 정보 추가)
     public ShareGroupResponse.InvitationInfo toShareGroupInvitationInfo(ShareGroup shareGroup, Member member) {
         // shareGroup의 참가자 목록을 DTO 리스트로 변환
@@ -54,6 +65,13 @@ public class ShareGroupConverter {
                 // 참여자 목록
                 .participantInfoList(participantInfoList)
                 .createdAt(shareGroup.getCreatedAt())
+                .build();
+    }
+
+    // 그룹 Id만 반환
+    public ShareGroupResponse.ShareGroupId toShareGroupId(ShareGroup shareGroup) {
+        return ShareGroupResponse.ShareGroupId.builder()
+                .shareGroupId(shareGroup.getId())
                 .build();
     }
 }

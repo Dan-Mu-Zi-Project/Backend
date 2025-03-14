@@ -6,4 +6,5 @@ import com.ssu.muzi.domain.shareGroup.entity.ShareGroup;
 
 public interface ShareGroupService {
     ShareGroup createShareGroup(ShareGroupRequest.CreateShareGroupRequest request, Member member);
+    ShareGroup updateShareGroup(ShareGroupRequest.UpdateShareGroupRequest request, Long shareGroupId, Member member);
 }

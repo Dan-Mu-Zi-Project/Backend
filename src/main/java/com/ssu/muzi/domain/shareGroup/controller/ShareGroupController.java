@@ -15,6 +15,8 @@ import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -37,6 +39,14 @@ public class ShareGroupController {
                 shareGroupConverter.toShareGroupInvitationInfo(shareGroup, member));
     }
 
-
+    @PatchMapping("{shareGroupId}/info")
+    @Operation(summary = "공유그룹 수정 API", description = "공유그룹을 수정하는 API입니다.")
+    public ResultResponse<ShareGroupResponse.ShareGroupId> updateShareGroup(@RequestBody @Valid ShareGroupRequest.UpdateShareGroupRequest request,
+                                                                            @PathVariable Long shareGroupId,
+                                                                            @LoginMember Member member) {
+        ShareGroup shareGroup = shareGroupService.updateShareGroup(request, shareGroupId, member);
+        return ResultResponse.of(ShareGroupResultCode.UPDATE_SHARE_GROUP,
+                shareGroupConverter.toShareGroupId(shareGroup));
+    }
 
 }
