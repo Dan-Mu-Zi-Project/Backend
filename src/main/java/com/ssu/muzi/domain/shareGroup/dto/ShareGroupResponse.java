@@ -1,6 +1,7 @@
 package com.ssu.muzi.domain.shareGroup.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.ssu.muzi.domain.member.dto.MemberResponse;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -39,6 +40,16 @@ public abstract class ShareGroupResponse {
         private Long shareGroupId;
         private Long profileId;
         private LocalDateTime joinedAt;
+    }
+
+    // 그룹의 임베딩벡터 응답 반환하는 DTO
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ShareGroupVector {
+        private Long shareGroupId;
+        private List<MemberResponse.MemberEmbedding> memberEmbeddingList;
     }
 
     @Getter

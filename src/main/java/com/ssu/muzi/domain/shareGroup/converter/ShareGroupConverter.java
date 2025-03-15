@@ -1,6 +1,8 @@
 package com.ssu.muzi.domain.shareGroup.converter;
 
+import com.ssu.muzi.domain.member.dto.MemberResponse;
 import com.ssu.muzi.domain.member.entity.Member;
+import com.ssu.muzi.domain.member.entity.MemberSampleImage;
 import com.ssu.muzi.domain.shareGroup.dto.ProfileResponse;
 import com.ssu.muzi.domain.shareGroup.dto.ShareGroupRequest;
 import com.ssu.muzi.domain.shareGroup.dto.ShareGroupResponse;
@@ -76,6 +78,39 @@ public class ShareGroupConverter {
                 .shareGroupId(profile.getShareGroup().getId())
                 .profileId(profile.getId())
                 .joinedAt(profile.getJoinedAt())
+                .build();
+    }
+
+    // 샘플 이미지 리스트를 받아 MemberEmbedding DTO를 생성
+    public MemberResponse.MemberEmbedding toMemberEmbedding(Profile profile, List<MemberSampleImage> sampleImageList) {
+        List<MemberResponse.EmbeddingVector> embeddingVectorList = sampleImageList
+                .stream()
+                .map(image -> MemberResponse.EmbeddingVector
+                        .builder()
+                        .angleType(image.getAngleType().name()) // enum → 문자열로 변환
+                        .vector(image.getFaceVector())
+                        .build())
+                .toList();
+
+        // 프로필에 저장된 닉네임이 있다면 사용, 없으면 연결된 member의 이름 사용
+        String name = profile.getMember().getName();
+
+        return MemberResponse.MemberEmbedding
+                .builder()
+                .memberId(profile.getMember().getId())
+                .profileId(profile.getId())
+                .name(name)
+                .embeddingVectorList(embeddingVectorList)
+                .build();
+    }
+
+    // ShareGroup과 EmbeddingVector List를 기반으로 최종 응답 DTO를 생성
+    public ShareGroupResponse.ShareGroupVector toShareGroupVector(ShareGroup shareGroup,
+                                                                  List<MemberResponse.MemberEmbedding> memberEmbeddingList) {
+        return ShareGroupResponse.ShareGroupVector
+                .builder()
+                .shareGroupId(shareGroup.getId())
+                .memberEmbeddingList(memberEmbeddingList)
                 .build();
     }
 

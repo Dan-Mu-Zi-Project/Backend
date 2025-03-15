@@ -16,12 +16,15 @@ import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import static com.ssu.muzi.global.result.code.ShareGroupResultCode.GET_VECTORLIST;
 
 @RestController
 @RequiredArgsConstructor
@@ -61,5 +64,13 @@ public class ShareGroupController {
         Profile profile = shareGroupService.joinShareGroup(shareGroupId, member);
         return ResultResponse.of(ShareGroupResultCode.JOIN_SHARE_GROUP,
                 shareGroupConverter.toShareGroupJoinInfo(profile));
+    }
+
+    // 특정 그룹의 얼굴 샘플 이미지 벡터값 조회 API
+    @GetMapping("/{shareGroupId}/vector")
+    @Operation(summary = "공유 그룹에 속한 모든 멤버의 벡터 조회 API", description = "해당 공유 그룹에 속한 회원들의 벡터(샘플 이미지) 정보를 조회합니다.")
+    public ResultResponse<ShareGroupResponse.ShareGroupVector> getShareGroupVectorList(@PathVariable Long shareGroupId) {
+        return ResultResponse.of(ShareGroupResultCode.GET_VECTORLIST,
+                shareGroupService.getShareGroupVectorList(shareGroupId));
     }
 }
