@@ -30,7 +30,6 @@ import static com.ssu.muzi.global.result.code.MemberResultCode.SET_WIFI;
 @RequiredArgsConstructor
 public class MemberController {
 
-    //배포 테스트
     private final MemberService memberService;
 
 
