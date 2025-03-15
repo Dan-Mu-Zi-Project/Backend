@@ -18,6 +18,16 @@ public class MemberConverter {
                 .build();
     }
 
+    // 로그인 시, 정보를 응답으로 변환하는 메소드
+    public OauthResponse.ServerAccessTokenInfo toServerAccessTokenInfo(String accessToken, Member member) {
+        // 응답객체 생성
+        OauthResponse.ServerAccessTokenInfo response = new OauthResponse.ServerAccessTokenInfo();
+        response.setAccessToken(accessToken);
+        response.setMemberId(member.getId());
+        response.setIsFaceCaptured(member.getIsFaceCaptured());
+        return response;
+    }
+
     // 인가 관련 응답을 DTO로 반환
     public OauthResponse.KakaoInfo toLoginUserInfo(Member member) {
         return OauthResponse.KakaoInfo.builder()

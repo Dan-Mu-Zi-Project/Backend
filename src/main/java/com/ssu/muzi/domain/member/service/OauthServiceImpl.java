@@ -6,7 +6,6 @@ import com.ssu.muzi.domain.member.dto.OauthResponse;
 import com.ssu.muzi.domain.member.entity.Member;
 import com.ssu.muzi.domain.member.repository.MemberRepository;
 import com.ssu.muzi.global.error.BusinessException;
-import com.ssu.muzi.global.security.util.SecurityUtil;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -18,7 +17,6 @@ import java.util.Arrays;
 
 import static com.ssu.muzi.global.error.code.JwtErrorCode.INVALID_REFRESH_TOKEN;
 import static com.ssu.muzi.global.error.code.JwtErrorCode.MEMBER_NOT_FOUND;
-import static com.ssu.muzi.global.error.code.JwtErrorCode.MEMBER_NOT_FOUND_BY_AUTH_ID;
 
 
 @Service
@@ -33,13 +31,20 @@ public class OauthServiceImpl implements OauthService {
 
     @Override
     public OauthResponse.ServerAccessTokenInfo login(OauthRequest.FrontAccessTokenInfo tokenRequest, HttpServletResponse response) {
-        OauthResponse.ServerAccessTokenInfo tokenResponse = new OauthResponse.ServerAccessTokenInfo(); //응답객체 생성
 
         // 프론트에서 받은 액세스 토큰으로 서버 자체 액세스 토큰 생성
         String accessToken = loginWithKakao(tokenRequest.getAccessToken(), response);
-        tokenResponse.setAccessToken(accessToken);
 
-        return tokenResponse;
+        // Kakao 액세스 토큰을 사용해 Kakao 사용자 정보를 가져옴
+        OauthResponse.KakaoInfo kakaoInfo = kakaoOauthService.getUserProfileByToken(tokenRequest.getAccessToken());
+
+
+        // authId로 회원 정보를 조회
+        Member member = memberRepository.findByAuthId(kakaoInfo.getAuthId())
+                .orElseThrow(() -> new BusinessException(MEMBER_NOT_FOUND));
+
+        // 컨버터를 사용해 응답 DTO 생성
+        return memberConverter.toServerAccessTokenInfo(accessToken, member);
     }
 
     @Override
