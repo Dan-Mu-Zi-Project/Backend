@@ -65,7 +65,7 @@ public class MemberController {
     }
 
     // 얼굴 샘플 이미지 저장 API
-    @PostMapping
+    @PostMapping("/sampleImage")
     @Operation(summary = "샘플 이미지 저장 API", description = "3개의 샘플이미지의 벡터값을 저장하는 API입니다.")
     public ResultResponse<MemberResponse.MemberId> saveSampleImage(@LoginMember Member member,
                                                                    @RequestBody @Valid MemberRequest.SampleImageList request) {
@@ -74,7 +74,7 @@ public class MemberController {
     }
 
     // 얼굴 샘플 이미지 수정 API
-    @PatchMapping
+    @PatchMapping("/sampleImage")
     @Operation(summary = "샘플 이미지 수정 API", description = "3개의 샘플이미지의 벡터값을 수정하는 API입니다.")
     public ResultResponse<MemberResponse.MemberId> updateSampleImage(@LoginMember Member member,
                                                                      @RequestBody @Valid MemberRequest.SampleImageList request) {
