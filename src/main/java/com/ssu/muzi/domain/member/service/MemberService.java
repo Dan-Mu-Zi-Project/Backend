@@ -10,4 +10,5 @@ public interface MemberService {
     MemberResponse.MemberId setMemberImageUrl(Member member, String memberImageUrl);
     MemberResponse.MemberId setWifi(Member member, Boolean onlyWifi);
     MemberResponse.MemberId saveSampleImages(Member member, MemberRequest.SampleImageList request);
+    MemberResponse.MemberId updateSampleImages(Member member, MemberRequest.SampleImageList request);
 }

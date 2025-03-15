@@ -72,5 +72,14 @@ public class MemberController {
         return ResultResponse.of(ShareGroupResultCode.SAVE_SAMPLE_IMAGE,
                 memberService.saveSampleImages(member, request));
     }
+
+    // 얼굴 샘플 이미지 수정 API
+    @PatchMapping
+    @Operation(summary = "샘플 이미지 수정 API", description = "3개의 샘플이미지의 벡터값을 수정하는 API입니다.")
+    public ResultResponse<MemberResponse.MemberId> updateSampleImage(@LoginMember Member member,
+                                                                     @RequestBody @Valid MemberRequest.SampleImageList request) {
+        return ResultResponse.of(ShareGroupResultCode.SAVE_SAMPLE_IMAGE,
+                memberService.updateSampleImages(member, request));
+    }
 }
 

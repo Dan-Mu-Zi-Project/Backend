@@ -118,6 +118,42 @@ public class MemberServiceImpl implements MemberService {
         return memberConverter.toMemberId(member);
     }
 
+    //샘플 이미지 수정
+    @Override
+    public MemberResponse.MemberId updateSampleImages(Member member, MemberRequest.SampleImageList request) {
+
+        // 1. 저장된 샘플 이미지 개수가 3개 미만이면 예외 처리
+        if (request.getFaceSampleList().size() < 3) {
+            throw new BusinessException(INVALID_SAMPLE_IMAGE_COUNT);
+        }
+
+        // 2. 기존 회원의 샘플 이미지 모두 삭제
+        memberSampleImageRepository.deleteByMember(member);
+
+        // 2. 요청 DTO List를 하나씩 엔티티 목록으로 변환 -> 마지막에 리스트로
+        List<MemberSampleImage> images = request.getFaceSampleList()
+                .stream()
+                .map(dto -> {
+                    // AngleType은 enum으로 가정하고, 대문자로 변환 후 사용
+                    AngleType angle = AngleType.valueOf(dto.getAngleType().toUpperCase());
+
+                    return MemberSampleImage.builder()
+                            .angleType(angle)
+                            .faceVector(dto.getFaceVector())
+                            .member(member)
+                            .build();
+                }).toList();
+
+        // 3. 변환된 엔티티들을 저장
+        memberSampleImageRepository.saveAll(images);
+
+        // 4. 회원의 isFaceCaptured 필드를 true로 업데이트
+        member.setIsFaceCaptured(true);
+        memberRepository.save(member);
+
+        return memberConverter.toMemberId(member);
+    }
+
     public Member findMemberByMemberId(Long memberId) {
         return memberRepository.findById(memberId)
                 .orElseThrow(() -> new BusinessException(MEMBER_NOT_FOUND_BY_MEMBER_ID));
