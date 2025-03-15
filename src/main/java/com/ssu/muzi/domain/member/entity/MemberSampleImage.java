@@ -32,8 +32,6 @@ public class MemberSampleImage extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "member_sample_image_id")
     private Long id;
-    @Column(name = "image_url")
-    private String imageUrl;
     @Column(name = "angle_type")
     private AngleType angleType;
     @Lob //대용량 문자 컬럼

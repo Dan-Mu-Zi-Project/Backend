@@ -1,11 +1,15 @@
 package com.ssu.muzi.domain.shareGroup.service;
 
+import com.ssu.muzi.domain.member.dto.MemberResponse;
 import com.ssu.muzi.domain.member.entity.Member;
+import com.ssu.muzi.domain.member.entity.MemberSampleImage;
 import com.ssu.muzi.domain.member.repository.MemberRepository;
+import com.ssu.muzi.domain.member.repository.MemberSampleImageRepository;
 import com.ssu.muzi.domain.shareGroup.converter.ProfileConverter;
 import com.ssu.muzi.domain.shareGroup.converter.ShareGroupConverter;
 import com.ssu.muzi.domain.shareGroup.dto.ProfileResponse;
 import com.ssu.muzi.domain.shareGroup.dto.ShareGroupRequest;
+import com.ssu.muzi.domain.shareGroup.dto.ShareGroupResponse;
 import com.ssu.muzi.domain.shareGroup.entity.Profile;
 import com.ssu.muzi.domain.shareGroup.entity.Role;
 import com.ssu.muzi.domain.shareGroup.entity.ShareGroup;
@@ -20,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static com.ssu.muzi.global.error.code.JwtErrorCode.MEMBER_NOT_FOUND;
 import static com.ssu.muzi.global.error.code.ShareGroupErrorCode.ALREADY_EXISTS_PROGRESSING_GROUP;
@@ -41,6 +46,7 @@ public class ShareGroupServiceImpl implements ShareGroupService {
     private final MemberRepository memberRepository;
     private final ProfileConverter profileConverter;
     private final ProfileRepository profileRepository;
+    private final MemberSampleImageRepository memberSampleImageRepository;
 
     @Override
     public ShareGroup createShareGroup(ShareGroupRequest.CreateShareGroupRequest request,
@@ -145,6 +151,28 @@ public class ShareGroupServiceImpl implements ShareGroupService {
         profileRepository.save(profile);
 
         return profile;  // 새로 생성된 프로필 반환
+    }
+
+    // 주어진 shareGroupId에 해당하는 공유 그룹의 회원 임베딩(샘플 이미지 벡터) 정보를 조회
+    @Override
+    public ShareGroupResponse.ShareGroupVector getShareGroupVectorList(Long shareGroupId) {
+
+        // 1. shareGroupId로 공유 그룹 조회
+        ShareGroup shareGroup = findShareGroup(shareGroupId);
+
+        // 2. 해당 그룹에 참여한 회원 리스트 조회
+        List<Profile> profileList = shareGroup.getProfileList();
+
+        // 3. 각 Profile마다, 연결된 Member의 샘플 이미지(벡터) 정보를 조회하여 DTO 변환
+        List<MemberResponse.MemberEmbedding> memberEmbeddingList =
+                profileList.stream()
+                .map(profile -> {
+                    List<MemberSampleImage> sampleImageList = memberSampleImageRepository.findByMember(profile.getMember());
+                    return shareGroupConverter.toMemberEmbedding(profile, sampleImageList);
+        }).collect(Collectors.toList());
+
+        // 4. 최종 응답 DTO 생성
+        return shareGroupConverter.toShareGroupVector(shareGroup, memberEmbeddingList);
     }
 
     // 그룹 생성시!! 기간이 겹치는 그룹이 이미 존재하는지 확인하는 메소드 - 내가 참여한 그룹 안에서만 안겹치면 됨

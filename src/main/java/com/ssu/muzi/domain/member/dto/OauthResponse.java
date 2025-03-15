@@ -10,6 +10,8 @@ public abstract class  OauthResponse {
     @Setter
     public static class ServerAccessTokenInfo {
         private String accessToken;
+        private Long memberId;
+        private Boolean isFaceCaptured;
     }
 
     // 카카오에서 유저 정보를 받아오는 응답 객체
