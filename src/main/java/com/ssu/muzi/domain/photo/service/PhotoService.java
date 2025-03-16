@@ -8,4 +8,5 @@ import java.util.List;
 
 public interface PhotoService {
     List<PhotoResponse.PreSignedUrl> getPreSignedUrlList(PhotoRequest.PreSignedUrlRequest request, Member member);
+    PhotoResponse.UploadPhotoList uploadPhotos(Long shareGroupId, Member uploader, PhotoRequest.PhotoUploadList request);
 }

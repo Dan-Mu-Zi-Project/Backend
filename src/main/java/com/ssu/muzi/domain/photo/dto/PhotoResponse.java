@@ -26,4 +26,23 @@ public abstract class PhotoResponse {
         private String photoUrl;
         private String photoName;
     }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class UploadPhotoList {
+        private Long uploaderProfileId;
+        private List<UploadPhoto> uploadPhotoList;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class UploadPhoto {
+        private Long photoId;
+        private String imageUrl;
+        private List<Long> profileIdList;
+    }
 }

@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 import static com.ssu.muzi.global.result.code.PhotoResultCode.CREATE_PRESIGNED_URL;
+import static com.ssu.muzi.global.result.code.PhotoResultCode.PHOTO_UPLOAD_BY_SHAREGROUP;
 
 @RestController
 @RequestMapping("/photos")
@@ -42,4 +44,12 @@ public class PhotoController {
         return ResultResponse.of(CREATE_PRESIGNED_URL, photoConverter.toPreSignedUrlList(preSignedUrlList));
     }
 
+    @PostMapping("/{shareGroupId}")
+    @Operation(summary = "특정 공유 그룹 사진 업로드 API", description = "특정 공유 그룹에 사진 업로드 및 사진에 등장한 프로필 매핑을 저장합니다.")
+    public ResultResponse<PhotoResponse.UploadPhotoList> uploadPhotos(@PathVariable Long shareGroupId,
+                                                                      @LoginMember Member member,
+                                                                      @RequestBody @Valid PhotoRequest.PhotoUploadList request) {
+        return ResultResponse.of(PHOTO_UPLOAD_BY_SHAREGROUP,
+                photoService.uploadPhotos(shareGroupId, member, request));
+    }
 }

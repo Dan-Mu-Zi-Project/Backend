@@ -1,5 +1,6 @@
 package com.ssu.muzi.domain.photo.service;
 
+import com.amazonaws.HttpMethod;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.Headers;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
@@ -8,6 +9,12 @@ import com.ssu.muzi.domain.member.entity.Member;
 import com.ssu.muzi.domain.photo.converter.PhotoConverter;
 import com.ssu.muzi.domain.photo.dto.PhotoRequest;
 import com.ssu.muzi.domain.photo.dto.PhotoResponse;
+import com.ssu.muzi.domain.photo.entity.Photo;
+import com.ssu.muzi.domain.photo.entity.PhotoProfileMap;
+import com.ssu.muzi.domain.photo.repository.PhotoProfileMapRepository;
+import com.ssu.muzi.domain.photo.repository.PhotoRepository;
+import com.ssu.muzi.domain.shareGroup.entity.Profile;
+import com.ssu.muzi.domain.shareGroup.service.ProfileService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,11 +22,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import com.amazonaws.HttpMethod;
 
 @Service
 @Transactional
@@ -29,6 +36,9 @@ public class PhotoServiceImpl implements PhotoService {
 
     private final AmazonS3 amazonS3;
     private final PhotoConverter photoConverter;
+    private final ProfileService profileService;
+    private final PhotoRepository photoRepository;
+    private final PhotoProfileMapRepository photoProfileMapRepository;
 
     @Value("${spring.cloud.aws.s3.photo-bucket}")
     private String BUCKET_NAME;
@@ -90,5 +100,46 @@ public class PhotoServiceImpl implements PhotoService {
         expTimeMillis += 1000 * 60 * 3;
         expiration.setTime(expTimeMillis);
         return expiration;
+    }
+
+    // ---------- 여기까지 presigned
+
+    @Override
+    // 특정 공유 그룹에 대해, 업로더(로그인한 Member)의 사진 업로드 요청을 처리
+    public PhotoResponse.UploadPhotoList uploadPhotos(Long shareGroupId, Member uploader, PhotoRequest.PhotoUploadList request) {
+
+        // 업로더의 해당 공유 그룹에 속한 Profile을 조회
+        Profile uploaderProfile = profileService.findProfile(uploader.getId(), shareGroupId);
+
+        // photo 정보를 담기 위한 리스트 생성
+        List<PhotoResponse.UploadPhoto> list = new ArrayList<>();
+
+        // 요청 DTO 내의 각 PhotoUpload 처리
+        for (PhotoRequest.PhotoUpload photoUpload : request.getPhotoList()) {
+
+            // 각 photoUpload에 포함된 profileId가 실제 존재하는지 검증
+            for (Long profileId : photoUpload.getProfileIdList()) {
+                profileService.findProfile(profileId);
+            }
+
+            // 1. 컨버터를 사용하여 1개의 Photo 엔티티 생성, 저장. (uploaderProfileId 설정)
+            Photo photo = photoConverter.toPhotoEntity(photoUpload, uploaderProfile.getId());
+            photo = photoRepository.save(photo);
+
+            // 2. 컨버터를 사용하여 해당 사진 1개의 PhotoProfileMap 엔티티 목록 생성 후 저장
+            List<PhotoProfileMap> mappingEntities = photoConverter.toPhotoProfileMapEntities(photo, photoUpload.getProfileIdList());
+            photoProfileMapRepository.saveAll(mappingEntities);
+
+            // 3. 컨버터를 사용해 응답용 Upload DTO 생성 (사진 1개 응답)
+            PhotoResponse.UploadPhoto uploadPhotoDTO = photoConverter.toUploadPhotoDTO(photo, photoUpload.getProfileIdList());
+            list.add(uploadPhotoDTO);
+        }
+
+        // 최종 응답 DTO 생성: 업로더의 Profile ID와 업로드된 사진 목록 포함
+        return PhotoResponse.UploadPhotoList
+                .builder()
+                .uploaderProfileId(uploaderProfile.getId())
+                .uploadPhotoList(list)
+                .build();
     }
 }
