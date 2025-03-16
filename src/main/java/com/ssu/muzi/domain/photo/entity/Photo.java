@@ -38,5 +38,4 @@ public class Photo extends BaseTimeEntity {
     private LocalDateTime takeAt; // 찍은 시간
     @Column(name = "uploader_profile_id", nullable = false)
     private Long uploaderProfileId;
-
 }
