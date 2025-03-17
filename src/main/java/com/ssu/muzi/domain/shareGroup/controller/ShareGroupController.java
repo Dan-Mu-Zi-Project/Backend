@@ -24,8 +24,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import static com.ssu.muzi.global.result.code.ShareGroupResultCode.GET_VECTORLIST;
-
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/shareGroups")
@@ -40,7 +38,7 @@ public class ShareGroupController {
                                                                               @LoginMember Member member) {
         ShareGroup shareGroup = shareGroupService.createShareGroup(request, member);
         return ResultResponse.of(ShareGroupResultCode.CREATE_SHARE_GROUP,
-                shareGroupConverter.toShareGroupInvitationInfo(shareGroup, member));
+                shareGroupConverter.toShareGroupInvitationInfo(shareGroup));
     }
 
     @PatchMapping("{shareGroupId}/info")
@@ -72,5 +70,14 @@ public class ShareGroupController {
     public ResultResponse<ShareGroupResponse.ShareGroupVector> getShareGroupVectorList(@PathVariable Long shareGroupId) {
         return ResultResponse.of(ShareGroupResultCode.GET_VECTORLIST,
                 shareGroupService.getShareGroupVectorList(shareGroupId));
+    }
+
+    // 특정 공유 그룹의 초대장 조회 API
+    @GetMapping("/{shareGroupId}/invite")
+    @Operation(summary = "공유 그룹의 초대장 조회", description = "해당 공유 그룹의 초대장을 조회합니다.")
+    public ResultResponse<ShareGroupResponse.InvitationInfo> getInvitation(@PathVariable Long shareGroupId) {
+        ShareGroup shareGroup = shareGroupService.findShareGroup(shareGroupId);
+        return ResultResponse.of(ShareGroupResultCode.GET_INVITATION,
+                shareGroupConverter.toShareGroupInvitationInfo(shareGroup));
     }
 }

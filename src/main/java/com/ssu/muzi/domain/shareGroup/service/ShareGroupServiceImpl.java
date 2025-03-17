@@ -72,7 +72,7 @@ public class ShareGroupServiceImpl implements ShareGroupService {
         validateTravelPeriodForMember(request.getStartedAt(), request.getEndedAt(), member);
 
         // 4. 그룹 생성 요청받은 그룹을 엔티티로 변환
-        ShareGroup newShareGroup = shareGroupConverter.toShareGroupEntity(request);
+        ShareGroup newShareGroup = shareGroupConverter.toShareGroupEntity(request, member);
 
         // 5. 생성된 공유 그룹을 먼저 저장하여 공유그룹 id가 생성되게 함
         newShareGroup = shareGroupRepository.save(newShareGroup);
@@ -204,7 +204,8 @@ public class ShareGroupServiceImpl implements ShareGroupService {
         }
     }
 
-    private ShareGroup findShareGroup(Long shareGroupId) {
+    @Override
+    public ShareGroup findShareGroup(Long shareGroupId) {
         return shareGroupRepository.findById(shareGroupId)
                 .orElseThrow(() -> new BusinessException(SHARE_GROUP_NOT_FOUND));
     }

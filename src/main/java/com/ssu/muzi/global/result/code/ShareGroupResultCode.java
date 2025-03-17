@@ -12,6 +12,7 @@ public enum ShareGroupResultCode implements ResultCode {
     JOIN_SHARE_GROUP(200, "SG003", "성공적으로 그룹에 가입하였습니다."),
     SAVE_SAMPLE_IMAGE(200, "SG004", "성공적으로 샘플이미지를 저장하였습니다."),
     GET_VECTORLIST(200, "SG005", "성공적으로 그룹에 속한 모든 멤버의 벡터값을 반환하였습니다."),
+    GET_INVITATION(200, "SG006", "성공적으로 초대장을 조회했습니다."),
     ;
     private final int status;
     private final String code;
