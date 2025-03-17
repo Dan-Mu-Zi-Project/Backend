@@ -52,6 +52,11 @@ public class ShareGroup extends BaseTimeEntity {
     private LocalDateTime startedAt; // 일정 시작
     @Column(name = "ended_at")
     private LocalDateTime endedAt; // 일정 끝
+    @Column(name = "owner_name")
+    private String ownerName;
+    @Column(name = "owner_image_url")
+    private String ownerImageUrl;
+
 
     @OneToMany(mappedBy = "shareGroup")
     @Builder.Default
