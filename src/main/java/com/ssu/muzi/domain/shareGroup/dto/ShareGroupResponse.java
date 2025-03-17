@@ -52,6 +52,24 @@ public abstract class ShareGroupResponse {
         private List<MemberResponse.MemberEmbedding> memberEmbeddingList;
     }
 
+    // 그룹 상세정보 반환
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ShareGroupDetailInfo {
+        private Long shareGroupId;
+        private String groupName;
+        private String description;
+        private String groupImage;
+        private String place;
+        @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
+        private LocalDateTime startedAt;
+        @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
+        private LocalDateTime endedAt;
+        private List<ProfileResponse.ParticipantInfo> participantInfoList;
+    }
+
     @Getter
     @Builder
     @NoArgsConstructor

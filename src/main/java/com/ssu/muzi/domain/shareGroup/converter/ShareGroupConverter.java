@@ -18,8 +18,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ShareGroupConverter {
 
-
-
     // 그룹 생성 요청 받은 그룹을 엔티티로 변환
     public ShareGroup toShareGroupEntity(ShareGroupRequest.CreateShareGroupRequest request, Member member) {
         return ShareGroup.builder()
@@ -88,6 +86,26 @@ public class ShareGroupConverter {
                 .shareGroupId(profile.getShareGroup().getId())
                 .profileId(profile.getId())
                 .joinedAt(profile.getJoinedAt())
+                .build();
+    }
+
+    // 그룹 상세 조회 시
+    public ShareGroupResponse.ShareGroupDetailInfo toShareGroupDetailInfo(ShareGroup shareGroup) {
+
+        // shareGroup의 참가자 목록을 DTO 리스트로 변환
+        List<ProfileResponse.ParticipantInfo> participantInfoList = toParticipantInfoList(shareGroup);
+
+        return ShareGroupResponse.ShareGroupDetailInfo
+                .builder()
+                .shareGroupId(shareGroup.getId())
+                .groupName(shareGroup.getGroupName())
+                .description(shareGroup.getDescription())
+                .groupImage(shareGroup.getGroupImageUrl())
+                .place(shareGroup.getPlace())
+                .startedAt(shareGroup.getStartedAt())
+                .endedAt(shareGroup.getEndedAt())
+                // 참여자 목록
+                .participantInfoList(participantInfoList)
                 .build();
     }
 
