@@ -12,4 +12,5 @@ public interface ShareGroupService {
     Profile joinShareGroup(Long shareGroupId, Member member);
     ShareGroupResponse.ShareGroupVector getShareGroupVectorList(Long shareGroupId);
     ShareGroup findShareGroup(Long shareGroupId);
+    ShareGroupResponse.Home getHomeGroups(Member member);
 }

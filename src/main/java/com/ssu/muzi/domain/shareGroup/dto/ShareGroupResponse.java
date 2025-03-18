@@ -70,6 +70,31 @@ public abstract class ShareGroupResponse {
         private List<ProfileResponse.ParticipantInfo> participantInfoList;
     }
 
+    // 홈 화면 정보
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Home {
+        private String name;               // 로그인한 사용자의 이름
+        private List<HomeDetail> homeDetailList;     // 참여한 그룹 리스트
+    }
+
+    // 홈 화면에 있는 각 그룹 정보를 보여줌
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class HomeDetail {
+        private Long shareGroupId;
+        private String status; // GroupStatus enum의 문자열 값
+        private String groupName;
+        private String place;
+        private LocalDateTime startedAt;
+        private LocalDateTime endedAt;
+    }
+
+
     @Getter
     @Builder
     @NoArgsConstructor

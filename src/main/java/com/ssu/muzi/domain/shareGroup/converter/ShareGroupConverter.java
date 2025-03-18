@@ -8,6 +8,7 @@ import com.ssu.muzi.domain.shareGroup.dto.ShareGroupRequest;
 import com.ssu.muzi.domain.shareGroup.dto.ShareGroupResponse;
 import com.ssu.muzi.domain.shareGroup.entity.Profile;
 import com.ssu.muzi.domain.shareGroup.entity.ShareGroup;
+import com.ssu.muzi.domain.shareGroup.entity.Status;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -139,6 +140,19 @@ public class ShareGroupConverter {
                 .builder()
                 .shareGroupId(shareGroup.getId())
                 .memberEmbeddingList(memberEmbeddingList)
+                .build();
+    }
+
+    // 홈 화면에 있는 "하나"의 그룹을 응답 DTO로 변환
+    public ShareGroupResponse.HomeDetail toHomeDetail(ShareGroup group, Status status) {
+        return ShareGroupResponse.HomeDetail
+                .builder()
+                .shareGroupId(group.getId())
+                .status(status.name()) // enum을 문자열로 변환 ("BEFORE_START", "IN_PROGRESS", "RECENTLY_ENDED")
+                .groupName(group.getGroupName())
+                .place(group.getPlace())
+                .startedAt(group.getStartedAt())
+                .endedAt(group.getEndedAt())
                 .build();
     }
 

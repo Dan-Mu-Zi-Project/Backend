@@ -13,6 +13,7 @@ import com.ssu.muzi.domain.shareGroup.dto.ShareGroupResponse;
 import com.ssu.muzi.domain.shareGroup.entity.Profile;
 import com.ssu.muzi.domain.shareGroup.entity.Role;
 import com.ssu.muzi.domain.shareGroup.entity.ShareGroup;
+import com.ssu.muzi.domain.shareGroup.entity.Status;
 import com.ssu.muzi.domain.shareGroup.repository.ProfileRepository;
 import com.ssu.muzi.domain.shareGroup.repository.ShareGroupRepository;
 import com.ssu.muzi.global.error.BusinessException;
@@ -23,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -173,6 +175,46 @@ public class ShareGroupServiceImpl implements ShareGroupService {
 
         // 4. 최종 응답 DTO 생성
         return shareGroupConverter.toShareGroupVector(shareGroup, memberEmbeddingList);
+    }
+
+    // 홈 화면 반환
+    @Override
+    public ShareGroupResponse.Home getHomeGroups(Member member) {
+
+        // 현재 시간 기준
+        LocalDateTime now = LocalDateTime.now();
+
+        // Member가 참여한 그룹들을 조회 (Profile, ShareGroup 관계를 통해)
+        List<ShareGroup> groupList = shareGroupRepository.findByMemberId(member.getId());
+
+        // 각 그룹의 상태를 서비스에서 계산한 후, 조건에 맞는 그룹만 DTO로 변환
+        List<ShareGroupResponse.HomeDetail> homeDetailList = groupList
+                .stream()
+                .map(group -> {
+                    Status status = computeGroupStatus(group, now);
+                    return status != null ? shareGroupConverter.toHomeDetail(group, status) : null;
+                })
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+
+        return ShareGroupResponse.Home
+                .builder()
+                .name(member.getName())  // 로그인한 사용자의 이름
+                .homeDetailList(homeDetailList)
+                .build();
+    }
+
+    // 현재 시간을 기준으로 그룹의 상태를 계산 (홈 화면 조회시)
+    private Status computeGroupStatus(ShareGroup group, LocalDateTime now) {
+        if (now.isBefore(group.getStartedAt())) {
+            return Status.BEFORE_START;
+        } else if (!now.isAfter(group.getEndedAt())) { // now <= endedAt
+            return Status.IN_PROGRESS;
+        } else if (now.isBefore(group.getEndedAt().plusDays(7))) {
+            return Status.RECENTLY_ENDED;
+        } else {
+            return null; // 홈 화면에 표시하지 않을 그룹
+        }
     }
 
     // 그룹 생성시!! 기간이 겹치는 그룹이 이미 존재하는지 확인하는 메소드 - 내가 참여한 그룹 안에서만 안겹치면 됨

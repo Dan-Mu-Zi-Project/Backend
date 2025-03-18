@@ -90,4 +90,12 @@ public class ShareGroupController {
                 shareGroupConverter.toShareGroupDetailInfo(shareGroup));
     }
 
+    // 홈 화면 조회
+    @GetMapping("/home")
+    @Operation(summary = "홈 화면: 현재 진행 중인 그룹 조회 API", description = "로그인한 사용자가 참여한 그룹 중, 아직 시작 전, 진행 중, 종료 후 7일 이내 그룹을 조회합니다.")
+    public ResultResponse<ShareGroupResponse.Home> getHomeGroups(@LoginMember Member member) {
+        return ResultResponse.of(ShareGroupResultCode.GET_HOME,
+                shareGroupService.getHomeGroups(member));
+    }
+
 }
