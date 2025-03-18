@@ -217,6 +217,19 @@ public class ShareGroupServiceImpl implements ShareGroupService {
         }
     }
 
+    // 그룹 이미지 업로드
+    public ShareGroupResponse.ShareGroupId updateGroupImage(Long shareGroupId, ShareGroupRequest.GroupImageUploadRequest request) {
+
+        ShareGroup shareGroup = findShareGroup(shareGroupId);
+
+        // 그룹의 이미지 URL 업데이트
+        shareGroup.setGroupImageUrl(request.getGroupImageUrl());
+        shareGroupRepository.save(shareGroup);
+
+        // shareGroupId를 응답으로 반환
+        return shareGroupConverter.toShareGroupId(shareGroup);
+    }
+
     // 그룹 생성시!! 기간이 겹치는 그룹이 이미 존재하는지 확인하는 메소드 - 내가 참여한 그룹 안에서만 안겹치면 됨
     private void validateTravelPeriodForMember(LocalDateTime startedAt, LocalDateTime endedAt, Member member) {
         // 내가 참여한 그룹 목록을 조회

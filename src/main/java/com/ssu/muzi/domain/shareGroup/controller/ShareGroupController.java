@@ -98,4 +98,13 @@ public class ShareGroupController {
                 shareGroupService.getHomeGroups(member));
     }
 
+    // 그룹 이미지 업로드
+    @PostMapping("/{shareGroupId}/image")
+    @Operation(summary = "그룹 이미지 업로드 API", description = "특정 공유 그룹의 이미지를 업데이트합니다.")
+    public ResultResponse<ShareGroupResponse.ShareGroupId> uploadGroupImage(@PathVariable Long shareGroupId,
+                                                                            @RequestBody @Valid ShareGroupRequest.GroupImageUploadRequest request) {
+        return ResultResponse.of(ShareGroupResultCode.UPLOAD_GROUPIMAGE,
+                shareGroupService.updateGroupImage(shareGroupId, request));
+    }
+
 }
