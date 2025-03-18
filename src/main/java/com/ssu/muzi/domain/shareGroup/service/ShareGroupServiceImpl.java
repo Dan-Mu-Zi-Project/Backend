@@ -5,9 +5,11 @@ import com.ssu.muzi.domain.member.entity.Member;
 import com.ssu.muzi.domain.member.entity.MemberSampleImage;
 import com.ssu.muzi.domain.member.repository.MemberRepository;
 import com.ssu.muzi.domain.member.repository.MemberSampleImageRepository;
+import com.ssu.muzi.domain.photo.entity.PhotoProfileMap;
+import com.ssu.muzi.domain.photo.repository.PhotoDownloadLogRepository;
+import com.ssu.muzi.domain.photo.repository.PhotoProfileMapRepository;
 import com.ssu.muzi.domain.shareGroup.converter.ProfileConverter;
 import com.ssu.muzi.domain.shareGroup.converter.ShareGroupConverter;
-import com.ssu.muzi.domain.shareGroup.dto.ProfileResponse;
 import com.ssu.muzi.domain.shareGroup.dto.ShareGroupRequest;
 import com.ssu.muzi.domain.shareGroup.dto.ShareGroupResponse;
 import com.ssu.muzi.domain.shareGroup.entity.Profile;
@@ -19,13 +21,15 @@ import com.ssu.muzi.domain.shareGroup.repository.ShareGroupRepository;
 import com.ssu.muzi.global.error.BusinessException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static com.ssu.muzi.global.error.code.JwtErrorCode.MEMBER_NOT_FOUND;
@@ -49,6 +53,9 @@ public class ShareGroupServiceImpl implements ShareGroupService {
     private final ProfileConverter profileConverter;
     private final ProfileRepository profileRepository;
     private final MemberSampleImageRepository memberSampleImageRepository;
+    private final ProfileService profileService;
+    private final PhotoProfileMapRepository photoProfileMapRepository;
+    private final PhotoDownloadLogRepository photoDownloadLogRepository;
 
     @Override
     public ShareGroup createShareGroup(ShareGroupRequest.CreateShareGroupRequest request,
@@ -203,6 +210,56 @@ public class ShareGroupServiceImpl implements ShareGroupService {
                 .homeDetailList(homeDetailList)
                 .build();
     }
+
+    // 내가 속한 전체 그룹의 리스트를 페이징 처리해서 반환 (그룹 프리뷰)
+    @Override
+    public Page<ShareGroupResponse.ShareGroupPreviewInfo> getMyShareGroupList(Member member, Pageable pageable) {
+
+        // 1. 해당 멤버의 논리 삭제되지 않은 모든 프로필에서 참여 중인 공유 그룹 ID 추출
+        List<Long> shareGroupIdList = profileRepository.findByMemberId(member.getId())
+                .stream()
+                .map(profile -> profile.getShareGroup().getId())
+                .distinct()
+                .collect(Collectors.toList());
+
+        // 2. 공유 그룹 ID 목록으로 페이징된 ShareGroup 조회
+        Page<ShareGroup> groupPageIds = shareGroupRepository.findByIdIn(shareGroupIdList, pageable);
+        LocalDateTime now = LocalDateTime.now();
+
+        // 3. 각 그룹마다, 내가 나온 내 앨범을 기준으로 해서, 전체 사진 수, 다운로드 수, 상태를 계산해서, 컨버터를 통해 응답으로 반환
+        List<ShareGroupResponse.ShareGroupPreviewInfo> groupPreviewList =
+                groupPageIds
+                        .getContent()
+                        .stream()
+                        .map(group -> {
+
+                // 해당 그룹에서 로그인한 사용자의 Profile id를 조회
+                Profile profile = profileService.findProfile(member.getId(), group.getId());
+
+                // 전체 사진 수: 해당 Profile에 매핑된 PhotoProfileMap 엔티티 수
+                List<PhotoProfileMap> albumPhotos = photoProfileMapRepository.findByProfile(profile);
+                long entireCount = albumPhotos.size();
+
+                // 다운로드 수: 위에서 계산한, albumPhotos의 photo id 목록을 기반으로, PhotoDownloadLog에서 내 Profile의 다운로드 수 집계
+                // a. 위에서 계산한 albumPhotos의 photo id를 집계
+                List<Long> albumPhotoIds = albumPhotos
+                        .stream()
+                        .map(ppm -> ppm.getPhoto().getId())
+                        .collect(Collectors.toList());
+                // b. 다운로드 수 집계
+                long downloadCount = albumPhotoIds.isEmpty() ? 0 :
+                        photoDownloadLogRepository.countByProfileAndPhotoIdIn(profile, albumPhotoIds);
+
+                // 그룹 상태 계산
+                Status status = computeGroupStatus(group, now);
+
+                return shareGroupConverter.toShareGroupPreview(group, status, downloadCount, entireCount);
+        }).collect(Collectors.toList());
+
+        // 4. PageImpl로 새로운 페이징된 그룹 리스트 생성
+        return new PageImpl<>(groupPreviewList, pageable, groupPageIds.getTotalElements());
+    }
+
 
     // 현재 시간을 기준으로 그룹의 상태를 계산 (홈 화면 조회시)
     private Status computeGroupStatus(ShareGroup group, LocalDateTime now) {

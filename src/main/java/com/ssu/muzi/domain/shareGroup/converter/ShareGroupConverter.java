@@ -10,6 +10,7 @@ import com.ssu.muzi.domain.shareGroup.entity.Profile;
 import com.ssu.muzi.domain.shareGroup.entity.ShareGroup;
 import com.ssu.muzi.domain.shareGroup.entity.Status;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -153,6 +154,33 @@ public class ShareGroupConverter {
                 .place(group.getPlace())
                 .startedAt(group.getStartedAt())
                 .endedAt(group.getEndedAt())
+                .build();
+    }
+
+    // 내가 속한 전체 그룹 조회 (프리뷰) 시, "그룹 하나"에 대한 응답
+    public ShareGroupResponse.ShareGroupPreviewInfo toShareGroupPreview (ShareGroup group, Status status, long downloadCount, long entireCount) {
+        return ShareGroupResponse.ShareGroupPreviewInfo
+                .builder()
+                .shareGroupId(group.getId())
+                .status(status.name())
+                .groupName(group.getGroupName())
+                .description(group.getDescription())
+                .startedAt(group.getStartedAt())
+                .endedAt(group.getEndedAt())
+                .downloadCount((int) downloadCount)
+                .entireCount((int) entireCount)
+                .createdAt(group.getCreatedAt())
+                .build();
+    }
+
+    // 내가 속한 전체 그룹 조회를, 응답용 페이징 처리로 변환
+    public ShareGroupResponse.PagedShareGroupInfo toPagedShareGroupInfo(Page<ShareGroupResponse.ShareGroupPreviewInfo> page) {
+        return ShareGroupResponse.PagedShareGroupInfo
+                .builder()
+                .shareGroupInfoList(page.getContent())
+                .totalElements(page.getTotalElements())
+                .isFirst(page.isFirst())
+                .isLast(page.isLast())
                 .build();
     }
 

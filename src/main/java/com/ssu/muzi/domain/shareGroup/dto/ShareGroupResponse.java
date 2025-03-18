@@ -94,6 +94,34 @@ public abstract class ShareGroupResponse {
         private LocalDateTime endedAt;
     }
 
+    // 내가 속한 전체 공유그룹 페이징 조회
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class PagedShareGroupInfo {
+        private List<ShareGroupPreviewInfo> shareGroupInfoList; //공유그룹 상세 정보 리스트
+        private int page; // 페이지 번호
+        private long totalElements; // 해당 조건에 부합하는 요소의 총 개수
+        private boolean isFirst; // 첫 페이지 여부
+        private boolean isLast; // 마지막 페이지 여부
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ShareGroupPreviewInfo {
+        private Long shareGroupId;
+        private String status;
+        private String groupName;
+        private String description;
+        private LocalDateTime startedAt;
+        private LocalDateTime endedAt;
+        private int downloadCount;
+        private int entireCount;
+        private LocalDateTime createdAt;
+    }
 
     @Getter
     @Builder

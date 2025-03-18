@@ -5,6 +5,8 @@ import com.ssu.muzi.domain.shareGroup.dto.ShareGroupRequest;
 import com.ssu.muzi.domain.shareGroup.dto.ShareGroupResponse;
 import com.ssu.muzi.domain.shareGroup.entity.Profile;
 import com.ssu.muzi.domain.shareGroup.entity.ShareGroup;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface ShareGroupService {
     ShareGroup createShareGroup(ShareGroupRequest.CreateShareGroupRequest request, Member member);
@@ -14,4 +16,5 @@ public interface ShareGroupService {
     ShareGroup findShareGroup(Long shareGroupId);
     ShareGroupResponse.Home getHomeGroups(Member member);
     ShareGroupResponse.ShareGroupId updateGroupImage(Long shareGroupId, ShareGroupRequest.GroupImageUploadRequest request);
+    Page<ShareGroupResponse.ShareGroupPreviewInfo> getMyShareGroupList(Member member, Pageable pageable);
 }
