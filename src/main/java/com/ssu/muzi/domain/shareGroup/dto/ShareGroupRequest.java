@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 
 public abstract class ShareGroupRequest {
 
+    // 그룹 생성시
     @Getter
     @Builder
     @NoArgsConstructor
@@ -38,6 +39,7 @@ public abstract class ShareGroupRequest {
         private LocalDateTime endedAt;
     }
 
+    // 그룹 수정시
     @Getter
     @Builder
     @NoArgsConstructor
@@ -62,5 +64,15 @@ public abstract class ShareGroupRequest {
         @NotNull(message = "종료 날짜는 필수로 입력해야 합니다.")
         @JsonFormat(pattern = "yyyy-MM-dd HH:mm", timezone = "Asia/Seoul")
         private LocalDateTime endedAt;
+    }
+
+    // 그룹 이미지 업로드
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class GroupImageUploadRequest {
+        @NotEmpty(message = "이미지 URL은 필수입니다.")
+        private String groupImageUrl;
     }
 }
