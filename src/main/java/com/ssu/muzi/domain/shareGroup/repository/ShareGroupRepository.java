@@ -1,6 +1,8 @@
 package com.ssu.muzi.domain.shareGroup.repository;
 
 import com.ssu.muzi.domain.shareGroup.entity.ShareGroup;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -16,7 +18,10 @@ public interface ShareGroupRepository extends JpaRepository<ShareGroup, Long> {
     boolean existsProgressingGroup(@Param("startedAt") LocalDateTime startedAt, @Param("endedAt") LocalDateTime endedAt);
 
     //특정 회원(memberId)이 참여하고 있는 모든 공유 그룹(ShareGroup) 을 중복 없이 조회하는 역할
-    @Query("SELECT DISTINCT s FROM ShareGroup s JOIN s.profileList p WHERE p.member.id = :memberId")
+    @Query("SELECT DISTINCT s FROM ShareGroup s JOIN s.profileList p WHERE p.member.id = :memberId and s.deletedAt is null")
     List<ShareGroup> findByMemberId(@Param("memberId") Long memberId);
+
+    //페이징 처리해서 shareGroup 가져오기
+    Page<ShareGroup> findByIdIn(List<Long> shareGroupIds, Pageable pageable);
 }
 
