@@ -45,4 +45,13 @@ public abstract class PhotoResponse {
         private String imageUrl;
         private List<Long> profileIdList;
     }
+
+    // 사진 다운로드 로그 기록시 응답
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class PhotoDownload {
+        private int downloadedCount;
+    }
 }

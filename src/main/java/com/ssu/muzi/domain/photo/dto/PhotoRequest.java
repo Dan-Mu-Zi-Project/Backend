@@ -43,4 +43,14 @@ public abstract class PhotoRequest {
         private String location;
         private String takedAt;
     }
+
+    // 사진 다운로드 요청
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class PhotoDownload {
+        @NotEmpty(message = "다운로드할 photoId 리스트는 비어있을 수 없습니다.")
+        private List<Long> photoIdList;
+    }
 }

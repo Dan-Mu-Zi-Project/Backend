@@ -10,11 +10,14 @@ import com.ssu.muzi.domain.photo.converter.PhotoConverter;
 import com.ssu.muzi.domain.photo.dto.PhotoRequest;
 import com.ssu.muzi.domain.photo.dto.PhotoResponse;
 import com.ssu.muzi.domain.photo.entity.Photo;
+import com.ssu.muzi.domain.photo.entity.PhotoDownloadLog;
 import com.ssu.muzi.domain.photo.entity.PhotoProfileMap;
+import com.ssu.muzi.domain.photo.repository.PhotoDownloadLogRepository;
 import com.ssu.muzi.domain.photo.repository.PhotoProfileMapRepository;
 import com.ssu.muzi.domain.photo.repository.PhotoRepository;
 import com.ssu.muzi.domain.shareGroup.entity.Profile;
 import com.ssu.muzi.domain.shareGroup.service.ProfileService;
+import com.ssu.muzi.global.error.BusinessException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,6 +31,8 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static com.ssu.muzi.global.error.code.PhotoErrorCode.PHOTO_NOT_FOUND;
+
 @Service
 @Transactional
 @Slf4j
@@ -39,6 +44,7 @@ public class PhotoServiceImpl implements PhotoService {
     private final ProfileService profileService;
     private final PhotoRepository photoRepository;
     private final PhotoProfileMapRepository photoProfileMapRepository;
+    private final PhotoDownloadLogRepository photoDownloadLogRepository;
 
     @Value("${spring.cloud.aws.s3.photo-bucket}")
     private String BUCKET_NAME;
@@ -142,4 +148,39 @@ public class PhotoServiceImpl implements PhotoService {
                 .uploadPhotoList(list)
                 .build();
     }
+
+
+    // 요청받은 photoIds에 대해, 나(profile)의 다운로드 로그 기록
+    @Override
+    public PhotoResponse.PhotoDownload recordDownload(Long shareGroupId, Member member, PhotoRequest.PhotoDownload request) {
+
+        // 1. 다운로드할 앨범이 있는, 해당 공유 그룹에 속한 내 Profile을 조회
+        Profile profile = profileService.findProfile(member.getId(), shareGroupId);
+
+        // 2. 다운로드 요청받은 photoIds에 대해
+        List<PhotoDownloadLog> logs = request.getPhotoIdList()
+                .stream()
+                .map(photoId -> {
+                    // 각 Photo를 조회 (및 검증. 없으면 exception)
+                    Photo photo = findPhoto(photoId);
+                    // 다운로드 로그 엔티티 생성
+                    return PhotoDownloadLog
+                            .builder()
+                            .profile(profile)
+                            .photo(photo)
+                            .build();
+                }).collect(Collectors.toList());
+
+        // 로그 엔티티들을 저장
+        photoDownloadLogRepository.saveAll(logs);
+
+        // 컨버터를 사용하여 응답 DTO로 변환
+        return photoConverter.toPhotoDownloadLog(logs);
+    }
+
+    private Photo findPhoto(Long photoId) {
+        return photoRepository.findById(photoId)
+                .orElseThrow(() -> new BusinessException(PHOTO_NOT_FOUND));
+    }
+
 }

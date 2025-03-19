@@ -3,6 +3,7 @@ package com.ssu.muzi.domain.photo.converter;
 import com.ssu.muzi.domain.photo.dto.PhotoRequest;
 import com.ssu.muzi.domain.photo.dto.PhotoResponse;
 import com.ssu.muzi.domain.photo.entity.Photo;
+import com.ssu.muzi.domain.photo.entity.PhotoDownloadLog;
 import com.ssu.muzi.domain.photo.entity.PhotoProfileMap;
 import com.ssu.muzi.domain.shareGroup.entity.Profile;
 import com.ssu.muzi.domain.shareGroup.service.ProfileService;
@@ -82,6 +83,14 @@ public class PhotoConverter {
                 .photoId(photo.getId())
                 .imageUrl(photo.getPhotoUrl())
                 .profileIdList(profileIdList)
+                .build();
+    }
+
+    // 사진 다운로드 시, 응답 반환 (다운로드한 사진의 개수)
+    public PhotoResponse.PhotoDownload toPhotoDownloadLog(List<PhotoDownloadLog> logs) {
+        return PhotoResponse.PhotoDownload
+                .builder()
+                .downloadedCount(logs.size())
                 .build();
     }
 
