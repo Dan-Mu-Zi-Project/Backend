@@ -233,6 +233,28 @@ public class PhotoServiceImpl implements PhotoService {
         return photoConverter.toPhotoId(photo);
     }
 
+    // 특정 photoId의 상세정보를 조회
+    @Override
+    public PhotoResponse.PhotoDetailInfo getPhotoDetail(Long photoId) {
+
+        // 1. Photo 엔티티 조회
+        Photo photo = findPhoto(photoId);
+
+        // 2. 업로더 프로필 조회 (Photo 엔티티에 저장된 uploaderProfileId 사용)
+        Profile uploaderProfile = profileService.findProfile(photo.getUploaderProfileId());
+
+        // 3. 참여자 프로필 조회: PhotoProfileMap을 통해 해당 Photo에 매핑된 모든 Profile 조회
+        List<PhotoProfileMap> mappingList = photoProfileMapRepository.findByPhoto(photo);
+        List<Profile> participantProfiles = mappingList
+                .stream()
+                .map(PhotoProfileMap::getProfile)
+                .distinct()
+                .collect(Collectors.toList());
+
+        // 4. 컨버터를 사용해 응답 DTO 생성
+        return photoConverter.toPhotoDetail(photo, uploaderProfile, participantProfiles);
+    }
+
     private Photo findPhoto(Long photoId) {
         return photoRepository.findById(photoId)
                 .orElseThrow(() -> new BusinessException(PHOTO_NOT_FOUND));
