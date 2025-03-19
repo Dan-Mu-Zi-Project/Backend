@@ -52,4 +52,5 @@ public class PhotoController {
         return ResultResponse.of(PHOTO_UPLOAD_BY_SHAREGROUP,
                 photoService.uploadPhotos(shareGroupId, member, request));
     }
+
 }
