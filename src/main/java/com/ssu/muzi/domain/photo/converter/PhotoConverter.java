@@ -94,4 +94,12 @@ public class PhotoConverter {
                 .build();
     }
 
+    // 사진 Id만 반환
+    public PhotoResponse.PhotoId toPhotoId(Photo photo) {
+        return PhotoResponse.PhotoId
+                .builder()
+                .photoId(photo.getId())
+                .build();
+    }
+
 }

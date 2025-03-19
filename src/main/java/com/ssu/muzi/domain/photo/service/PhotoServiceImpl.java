@@ -11,8 +11,10 @@ import com.ssu.muzi.domain.photo.dto.PhotoRequest;
 import com.ssu.muzi.domain.photo.dto.PhotoResponse;
 import com.ssu.muzi.domain.photo.entity.Photo;
 import com.ssu.muzi.domain.photo.entity.PhotoDownloadLog;
+import com.ssu.muzi.domain.photo.entity.PhotoLike;
 import com.ssu.muzi.domain.photo.entity.PhotoProfileMap;
 import com.ssu.muzi.domain.photo.repository.PhotoDownloadLogRepository;
+import com.ssu.muzi.domain.photo.repository.PhotoLikeRepository;
 import com.ssu.muzi.domain.photo.repository.PhotoProfileMapRepository;
 import com.ssu.muzi.domain.photo.repository.PhotoRepository;
 import com.ssu.muzi.domain.shareGroup.entity.Profile;
@@ -31,6 +33,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static com.ssu.muzi.global.error.code.PhotoErrorCode.ALREADY_LIKED;
 import static com.ssu.muzi.global.error.code.PhotoErrorCode.PHOTO_NOT_FOUND;
 
 @Service
@@ -45,6 +48,7 @@ public class PhotoServiceImpl implements PhotoService {
     private final PhotoRepository photoRepository;
     private final PhotoProfileMapRepository photoProfileMapRepository;
     private final PhotoDownloadLogRepository photoDownloadLogRepository;
+    private final PhotoLikeRepository photoLikeRepository;
 
     @Value("${spring.cloud.aws.s3.photo-bucket}")
     private String BUCKET_NAME;
@@ -177,6 +181,36 @@ public class PhotoServiceImpl implements PhotoService {
         // 컨버터를 사용하여 응답 DTO로 변환
         return photoConverter.toPhotoDownloadLog(logs);
     }
+
+
+    // 특정 photoId에 대해, 로그인한 사용자의 기본 Profile을 기준으로 좋아요를 기록
+    @Override
+    public PhotoResponse.PhotoId likePhoto(Long photoId, Long shareGroupId, Member member) {
+
+        // 1. 로그인한 사용자의 Profile을 조회
+        Profile profile = profileService.findProfile(member.getId(), shareGroupId);
+
+        // 2. photoId에 해당하는 Photo 엔티티를 조회
+        Photo photo = findPhoto(photoId);
+
+        // 3. 같은 profile, photo 조합이 이미 존재하는지 확인하고, 이미 존재하면 exception
+        photoLikeRepository.findByProfileAndPhoto(profile, photo)
+                .ifPresent(existingLike -> {
+                    throw new BusinessException(ALREADY_LIKED);
+                });
+
+        // 4. 새로운 PhotoLike 엔티티를 생성하고 저장
+        PhotoLike photoLike = PhotoLike
+                .builder()
+                .profile(profile)
+                .photo(photo)
+                .build();
+        photoLikeRepository.save(photoLike);
+
+        // 5. 컨버터를 사용해 응답 DTO로 변환 (photo Id만 반환)
+        return photoConverter.toPhotoId(photo);
+    }
+
 
     private Photo findPhoto(Long photoId) {
         return photoRepository.findById(photoId)

@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import static com.ssu.muzi.global.result.code.PhotoResultCode.PHOTO_DOWNLOAD;
+import static com.ssu.muzi.global.result.code.PhotoResultCode.PHOTO_LIKE;
 
 @RestController
 @RequestMapping("/gallery")
@@ -35,6 +36,16 @@ public class GalleryController {
                                                                       @RequestBody @Valid PhotoRequest.PhotoDownload request) {
         return ResultResponse.of(PHOTO_DOWNLOAD,
                 photoService.recordDownload(shareGroupId, member, request));
+    }
+
+    @PostMapping("photos/{shareGroupId}/{photoId}/like")
+    @Operation(summary = "사진 좋아요 누르기 API",
+            description = "특정 사진에 좋아요 기록을 남깁니다. 같은 사용자가 같은 사진에 여러 번 좋아요를 누를 수 없습니다.")
+    public ResultResponse<PhotoResponse.PhotoId> likePhoto(@PathVariable Long photoId,
+                                                           @PathVariable Long shareGroupId,
+                                                           @LoginMember Member member) {
+        return ResultResponse.of(PHOTO_LIKE,
+                photoService.likePhoto(photoId, shareGroupId, member));
     }
 
 }

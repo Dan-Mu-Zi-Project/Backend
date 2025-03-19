@@ -54,4 +54,13 @@ public abstract class PhotoResponse {
     public static class PhotoDownload {
         private int downloadedCount;
     }
+
+    // 사진 id를 응답
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class PhotoId {
+        private Long photoId;
+    }
 }
