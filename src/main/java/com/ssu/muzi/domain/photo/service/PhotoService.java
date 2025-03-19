@@ -11,4 +11,5 @@ public interface PhotoService {
     PhotoResponse.UploadPhotoList uploadPhotos(Long shareGroupId, Member uploader, PhotoRequest.PhotoUploadList request);
     PhotoResponse.PhotoDownload recordDownload(Long shareGroupId, Member member, PhotoRequest.PhotoDownload request);
     PhotoResponse.PhotoId likePhoto(Long photoId, Long shareGroupId, Member member);
+    PhotoResponse.PhotoId cancelLike(Long shareGroupId, Long photoId, Member member);
 }

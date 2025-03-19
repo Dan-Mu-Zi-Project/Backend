@@ -11,12 +11,14 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import static com.ssu.muzi.global.result.code.PhotoResultCode.CANCEL_LIKE;
 import static com.ssu.muzi.global.result.code.PhotoResultCode.PHOTO_DOWNLOAD;
 import static com.ssu.muzi.global.result.code.PhotoResultCode.PHOTO_LIKE;
 
@@ -38,7 +40,7 @@ public class GalleryController {
                 photoService.recordDownload(shareGroupId, member, request));
     }
 
-    @PostMapping("photos/{shareGroupId}/{photoId}/like")
+    @PostMapping("/{shareGroupId}/{photoId}/like")
     @Operation(summary = "사진 좋아요 누르기 API",
             description = "특정 사진에 좋아요 기록을 남깁니다. 같은 사용자가 같은 사진에 여러 번 좋아요를 누를 수 없습니다.")
     public ResultResponse<PhotoResponse.PhotoId> likePhoto(@PathVariable Long photoId,
@@ -46,6 +48,16 @@ public class GalleryController {
                                                            @LoginMember Member member) {
         return ResultResponse.of(PHOTO_LIKE,
                 photoService.likePhoto(photoId, shareGroupId, member));
+    }
+
+    @DeleteMapping("/{shareGroupId}/{photoId}/cancelLike")
+    @Operation(summary = "사진 좋아요 취소 API",
+            description = "로그인한 사용자가 특정 사진에 대해 좋아요를 취소합니다. (hard delete)")
+    public ResultResponse<PhotoResponse.PhotoId> cancelLike(@PathVariable Long shareGroupId,
+                                                            @PathVariable Long photoId,
+                                                            @LoginMember Member member) {
+        return ResultResponse.of(CANCEL_LIKE,
+                photoService.cancelLike(photoId, shareGroupId, member));
     }
 
 }

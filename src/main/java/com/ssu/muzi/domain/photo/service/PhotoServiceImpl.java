@@ -34,6 +34,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static com.ssu.muzi.global.error.code.PhotoErrorCode.ALREADY_LIKED;
+import static com.ssu.muzi.global.error.code.PhotoErrorCode.NOT_LIKED;
 import static com.ssu.muzi.global.error.code.PhotoErrorCode.PHOTO_NOT_FOUND;
 
 @Service
@@ -211,6 +212,26 @@ public class PhotoServiceImpl implements PhotoService {
         return photoConverter.toPhotoId(photo);
     }
 
+    // 특정 photoId에 대해, 로그인한 사용자의 Profile을 기준으로 좋아요 취소(hard delete)를 진행
+    @Override
+    public PhotoResponse.PhotoId cancelLike(Long shareGroupId, Long photoId, Member member) {
+
+        // 1. 로그인한 사용자의 해당 공유 그룹 내 Profile 조회
+        Profile profile = profileService.findProfile(member.getId(), shareGroupId);
+
+        // 2. photoId에 해당하는 Photo 엔티티 조회
+        Photo photo = findPhoto(photoId);
+
+        // 3. 같은 Profile, Photo 조합으로 기록된 좋아요가 있는지 확인하고, 없다면 에러
+        PhotoLike photoLike = photoLikeRepository.findByProfileAndPhoto(profile, photo)
+                .orElseThrow(() -> new BusinessException(NOT_LIKED));
+
+        // 4. 좋아요 기록 hard delete
+        photoLikeRepository.delete(photoLike);
+
+        // 5. 컨버터를 사용해 응답 DTO 생성 및 반환
+        return photoConverter.toPhotoId(photo);
+    }
 
     private Photo findPhoto(Long photoId) {
         return photoRepository.findById(photoId)
