@@ -23,6 +23,8 @@ import com.ssu.muzi.global.error.BusinessException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -232,6 +234,48 @@ public class PhotoServiceImpl implements PhotoService {
         // 5. 컨버터를 사용해 응답 DTO 생성 및 반환
         return photoConverter.toPhotoId(photo);
     }
+
+    // 특정 photoId의 상세정보를 조회
+    @Override
+    public PhotoResponse.PhotoDetailInfo getPhotoDetail(Long photoId) {
+
+        // 1. Photo 엔티티 조회
+        Photo photo = findPhoto(photoId);
+
+        // 2. 업로더 프로필 조회 (Photo 엔티티에 저장된 uploaderProfileId 사용)
+        Profile uploaderProfile = profileService.findProfile(photo.getUploaderProfileId());
+
+        // 3. 참여자 프로필 조회: PhotoProfileMap을 통해 해당 Photo에 매핑된 모든 Profile 조회
+        List<PhotoProfileMap> mappingList = photoProfileMapRepository.findByPhoto(photo);
+        List<Profile> participantProfiles = mappingList
+                .stream()
+                .map(PhotoProfileMap::getProfile)
+                .distinct()
+                .collect(Collectors.toList());
+
+        // 4. 컨버터를 사용해 응답 DTO 생성
+        return photoConverter.toPhotoDetail(photo, uploaderProfile, participantProfiles);
+    }
+
+    // 특정 ProfileId의 앨범 안에서, 사진 리스트를 조회
+    @Override
+    public Page<PhotoResponse.PhotoPreviewInfo> getPhotoList(Member member, Long shareGroupId, Long albumProfileId, Pageable pageable) {
+
+        // 1. 내 프로필 id를 해당 공유 그룹에서 조회
+        Profile myProfile = profileService.findProfile(member.getId(), shareGroupId);
+
+        // 2. 앨범 소유자(profileId)에 매핑된 사진들을 페이징으로 조회
+        Page<Photo> photoPage = photoRepository.findByProfileId(albumProfileId, pageable);
+
+        // 3. 각 사진마다, 내 프로필 기준 좋아요 및 다운로드 여부를 체크하여 DTO로 변환
+        return photoPage.map(photo -> {
+            boolean isLikedByUser = photoLikeRepository.existsByProfileAndPhoto(myProfile, photo);
+            boolean isDownloadedByUser = photoDownloadLogRepository.existsByProfileAndPhoto(myProfile, photo);
+            return photoConverter.toPhotoPreview(photo, isLikedByUser, isDownloadedByUser);
+        });
+    }
+
+
 
     private Photo findPhoto(Long photoId) {
         return photoRepository.findById(photoId)

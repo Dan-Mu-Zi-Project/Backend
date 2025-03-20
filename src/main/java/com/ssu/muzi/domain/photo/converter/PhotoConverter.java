@@ -5,15 +5,19 @@ import com.ssu.muzi.domain.photo.dto.PhotoResponse;
 import com.ssu.muzi.domain.photo.entity.Photo;
 import com.ssu.muzi.domain.photo.entity.PhotoDownloadLog;
 import com.ssu.muzi.domain.photo.entity.PhotoProfileMap;
+import com.ssu.muzi.domain.shareGroup.dto.ProfileResponse;
 import com.ssu.muzi.domain.shareGroup.entity.Profile;
 import com.ssu.muzi.domain.shareGroup.service.ProfileService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static org.hibernate.validator.internal.engine.messageinterpolation.el.RootResolver.FORMATTER;
 
 @Component
 @RequiredArgsConstructor
@@ -91,6 +95,60 @@ public class PhotoConverter {
         return PhotoResponse.PhotoDownload
                 .builder()
                 .downloadedCount(logs.size())
+                .build();
+    }
+
+    // 특정 사진의 상세정보 반환
+    public PhotoResponse.PhotoDetailInfo toPhotoDetail(Photo photo, Profile uploaderProfile, List<Profile> participantProfiles) {
+        return PhotoResponse.PhotoDetailInfo
+                .builder()
+                .photoId(photo.getId())
+                .photoUrl(photo.getPhotoUrl())
+                .takeDate(photo.getTakeAt())
+                .location(photo.getLocation())
+                .uploaderInfo(ProfileResponse.ParticipantInfo
+                        .builder()
+                        .profileId(uploaderProfile.getId())
+                        .memberImageUrl(uploaderProfile.getMember().getMemberImageUrl())
+                        .name(uploaderProfile.getMember().getName())
+                        .build())
+                .participantInfoList(
+                        participantProfiles
+                                .stream()
+                                .map(profile -> ProfileResponse.ParticipantInfo
+                                        .builder()
+                                        .profileId(profile.getId())
+                                        .memberImageUrl(profile.getMember().getMemberImageUrl())
+                                        .name(profile.getMember().getName())
+                                        .build())
+                                .collect(Collectors.toList())
+                )
+                .build();
+    }
+
+
+    // 특정 앨범의 사진 리스트 응답 시, 하나의 사진 정보를 반환
+    public PhotoResponse.PhotoPreviewInfo toPhotoPreview(Photo photo, boolean isLikedByUser, boolean isDownloadedByUser) {
+        return PhotoResponse.PhotoPreviewInfo
+                .builder()
+                .photoId(photo.getId())
+                .photoUrl(photo.getPhotoUrl())
+                .isLikedByUser(isLikedByUser)
+                .isDownloadedByUser(isDownloadedByUser)
+                .build();
+    }
+
+    // 특정 앨범의 사진 리스트 응답 시, 최종 응답용 PagedPhoto DTO로 변환
+    public PhotoResponse.PagedPhotoInfo toPagedPhotoInfo(Page<PhotoResponse.PhotoPreviewInfo> dtoPage, Long shareGroupId, Long albumProfileId) {
+        return PhotoResponse.PagedPhotoInfo
+                .builder()
+                .shareGroupId(shareGroupId)
+                .profileId(albumProfileId)
+                .photoPreviewList(dtoPage.getContent())
+                .page(dtoPage.getTotalPages())
+                .totalElements(dtoPage.getTotalElements())
+                .isFirst(dtoPage.isFirst())
+                .isLast(dtoPage.isLast())
                 .build();
     }
 

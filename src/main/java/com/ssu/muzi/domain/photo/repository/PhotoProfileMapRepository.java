@@ -1,5 +1,6 @@
 package com.ssu.muzi.domain.photo.repository;
 
+import com.ssu.muzi.domain.photo.entity.Photo;
 import com.ssu.muzi.domain.photo.entity.PhotoProfileMap;
 import com.ssu.muzi.domain.shareGroup.entity.Profile;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,4 +12,6 @@ import java.util.List;
 public interface PhotoProfileMapRepository extends JpaRepository<PhotoProfileMap, Long> {
     // 해당 Profile에 매핑된 PhotoProfileMap 리스트 조회
     List<PhotoProfileMap> findByProfile(Profile profile);
+    // 해당 Photo에 매핑된 프로필 리스트 조회
+    List<PhotoProfileMap> findByPhoto(Photo photo);
 }

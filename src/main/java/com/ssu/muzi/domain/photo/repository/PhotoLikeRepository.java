@@ -11,4 +11,5 @@ import java.util.Optional;
 @Repository
 public interface PhotoLikeRepository extends JpaRepository<PhotoLike, Long> {
     Optional<PhotoLike> findByProfileAndPhoto(Profile profile, Photo photo);
+    boolean existsByProfileAndPhoto(Profile profile, Photo photo);
 }
