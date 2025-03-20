@@ -66,6 +66,4 @@ public class PhotoController {
                 photoService.getPhotoDetail(photoId));
     }
 
-
-
 }

@@ -9,6 +9,7 @@ import com.ssu.muzi.domain.shareGroup.dto.ProfileResponse;
 import com.ssu.muzi.domain.shareGroup.entity.Profile;
 import com.ssu.muzi.domain.shareGroup.service.ProfileService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -122,6 +123,32 @@ public class PhotoConverter {
                                         .build())
                                 .collect(Collectors.toList())
                 )
+                .build();
+    }
+
+
+    // 특정 앨범의 사진 리스트 응답 시, 하나의 사진 정보를 반환
+    public PhotoResponse.PhotoPreviewInfo toPhotoPreview(Photo photo, boolean isLikedByUser, boolean isDownloadedByUser) {
+        return PhotoResponse.PhotoPreviewInfo
+                .builder()
+                .photoId(photo.getId())
+                .photoUrl(photo.getPhotoUrl())
+                .isLikedByUser(isLikedByUser)
+                .isDownloadedByUser(isDownloadedByUser)
+                .build();
+    }
+
+    // 특정 앨범의 사진 리스트 응답 시, 최종 응답용 PagedPhoto DTO로 변환
+    public PhotoResponse.PagedPhotoInfo toPagedPhotoInfo(Page<PhotoResponse.PhotoPreviewInfo> dtoPage, Long shareGroupId, Long albumProfileId) {
+        return PhotoResponse.PagedPhotoInfo
+                .builder()
+                .shareGroupId(shareGroupId)
+                .profileId(albumProfileId)
+                .photoPreviewList(dtoPage.getContent())
+                .page(dtoPage.getTotalPages())
+                .totalElements(dtoPage.getTotalElements())
+                .isFirst(dtoPage.isFirst())
+                .isLast(dtoPage.isLast())
                 .build();
     }
 

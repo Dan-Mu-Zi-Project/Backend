@@ -71,6 +71,33 @@ public abstract class PhotoResponse {
         private List<ProfileResponse.ParticipantInfo> participantInfoList;
     }
 
+    // 특정 profileId의 사진 리스트를 페이징 조회
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class PagedPhotoInfo {
+        private Long shareGroupId;
+        private Long profileId; //누구의 앨범인지
+        private List<PhotoPreviewInfo> photoPreviewList; //특정 프로필 앨범의 사진 리스트
+        private int page; // 페이지 번호
+        private long totalElements; // 해당 조건에 부합하는 요소의 총 개수
+        private boolean isFirst; // 첫 페이지 여부
+        private boolean isLast; // 마지막 페이지 여부
+    }
+
+    // 특정 profileId의 사진 리스트 페이징 조회 시, 하나의 사진을 의미
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class PhotoPreviewInfo {
+        private Long photoId;
+        private String photoUrl;
+        private boolean isLikedByUser;
+        private boolean isDownloadedByUser;
+    }
+
 
     // 사진 id를 응답
     @Getter
