@@ -152,6 +152,14 @@ public class PhotoConverter {
                 .build();
     }
 
+    // 사진 삭제 시, 삭제 개수 반환
+    public PhotoResponse.PhotoDeleteInfo toPhotoDeleteInfo(int deletedCount) {
+        return PhotoResponse.PhotoDeleteInfo
+                .builder()
+                .deletedCount(deletedCount)
+                .build();
+    }
+
     // 사진 Id만 반환
     public PhotoResponse.PhotoId toPhotoId(Photo photo) {
         return PhotoResponse.PhotoId

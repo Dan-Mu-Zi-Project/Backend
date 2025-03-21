@@ -98,7 +98,6 @@ public abstract class PhotoResponse {
         private boolean isDownloadedByUser;
     }
 
-
     // 사진 id를 응답
     @Getter
     @Builder
@@ -106,5 +105,14 @@ public abstract class PhotoResponse {
     @AllArgsConstructor
     public static class PhotoId {
         private Long photoId;
+    }
+
+    // 사진 삭제 시
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class PhotoDeleteInfo {
+        private int deletedCount;
     }
 }

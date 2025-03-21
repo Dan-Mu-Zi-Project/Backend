@@ -3,6 +3,7 @@ package com.ssu.muzi.domain.photo.service;
 import com.ssu.muzi.domain.member.entity.Member;
 import com.ssu.muzi.domain.photo.dto.PhotoRequest;
 import com.ssu.muzi.domain.photo.dto.PhotoResponse;
+import com.ssu.muzi.domain.photo.entity.Photo;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -16,4 +17,5 @@ public interface PhotoService {
     PhotoResponse.PhotoId cancelLike(Long shareGroupId, Long photoId, Member member);
     PhotoResponse.PhotoDetailInfo getPhotoDetail(Long photoId);
     Page<PhotoResponse.PhotoPreviewInfo> getPhotoList(Member member, Long shareGroupId, Long albumProfileId, Pageable pageable);
+    PhotoResponse.PhotoDeleteInfo deletePhotoList(PhotoRequest.PhotoDelete request);
 }

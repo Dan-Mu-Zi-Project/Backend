@@ -13,7 +13,8 @@ public enum PhotoResultCode implements ResultCode {
     PHOTO_LIKE(200, "SP003", "성공적으로 사진에 좋아요를 눌렀습니다."),
     CANCEL_LIKE(200, "SP004", "성공적으로 사진의 좋아요를 취소했습니다."),
     GET_PHOTO_DETAIL(200, "SP005", "성공적으로 사진의 상세 정보를 조회했습니다."),
-    PHOTO_LIST_INFO(200, "SP006", "성공적으로 사진 리스트를 조회했습니다.")
+    PHOTO_LIST_INFO(200, "SP006", "성공적으로 사진 리스트를 조회했습니다."),
+    DELETE_PHOTO(200, "SP007", "성공적으로 사진을 삭제했습니다."),
     ;
     private final int status;
     private final String code;
