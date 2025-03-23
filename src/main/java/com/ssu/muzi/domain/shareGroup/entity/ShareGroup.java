@@ -69,4 +69,11 @@ public class ShareGroup extends BaseTimeEntity {
         }
         this.profileList.add(profile);
     }
+
+    public void delete() {
+        for (Profile profile : profileList) {
+            profile.delete();
+        }
+        super.delete();
+    }
 }

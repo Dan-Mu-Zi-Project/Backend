@@ -127,13 +127,27 @@ public class ShareGroupController {
                 shareGroupConverter.toPagedShareGroupInfo(shareGroupList));
     }
 
-    // 그룹 탈퇴
+    // 그룹 삭제
     @DeleteMapping("/{shareGroupId}/leave")
     @Operation(summary = "그룹 탈퇴 API",
-            description = "그룹 내 회원이 2명 이상일 때, 그룹에서 탈퇴할 수 있습니다.")
+            description = "본인 제외 그룹 내 회원이 남아 있을 때만, 그룹을 탈퇴할 수 있습니다.")
     public ResultResponse<ShareGroupResponse.ShareGroupId> leaveShareGroup(@PathVariable Long shareGroupId,
-                                                                           @LoginMember Member member) {
+                                                                            @LoginMember Member member) {
         return ResultResponse.of(ShareGroupResultCode.LEAVE_SHARE_GROUP,
                 shareGroupService.leaveShareGroup(shareGroupId, member));
     }
+
+    // 그룹 탈퇴
+    @DeleteMapping("/{shareGroupId}")
+    @Operation(summary = "그룹 삭제 API",
+            description = "그룹 내 회원이 본인밖에 없을 때, 그룹을 삭제할 수 있습니다.")
+    public ResultResponse<ShareGroupResponse.ShareGroupId> deleteShareGroup(@PathVariable Long shareGroupId,
+                                                                           @LoginMember Member member) {
+        return ResultResponse.of(ShareGroupResultCode.DELETE_SHARE_GROUP,
+                shareGroupService.deleteShareGroup(shareGroupId, member));
+    }
+
+
+
+
 }

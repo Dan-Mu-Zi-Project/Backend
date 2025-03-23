@@ -18,4 +18,5 @@ public interface ShareGroupService {
     ShareGroupResponse.ShareGroupId updateGroupImage(Long shareGroupId, ShareGroupRequest.GroupImageUploadRequest request);
     Page<ShareGroupResponse.ShareGroupPreviewInfo> getMyShareGroupList(Member member, Pageable pageable);
     ShareGroupResponse.ShareGroupId leaveShareGroup(Long shareGroupId, Member member);
+    ShareGroupResponse.ShareGroupId deleteShareGroup(Long shareGroupId, Member member);
 }

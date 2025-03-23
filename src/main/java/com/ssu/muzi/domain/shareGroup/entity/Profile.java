@@ -1,6 +1,8 @@
 package com.ssu.muzi.domain.shareGroup.entity;
 
 import com.ssu.muzi.domain.member.entity.Member;
+import com.ssu.muzi.domain.photo.entity.PhotoProfileMap;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -11,6 +13,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -21,6 +24,8 @@ import lombok.Setter;
 import org.hibernate.annotations.SQLRestriction;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "profile")
@@ -46,6 +51,10 @@ public class Profile {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "share_group_id")
     private ShareGroup shareGroup;
+
+    @OneToMany(mappedBy = "profile", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<PhotoProfileMap> photoProfileMapList = new ArrayList<>();
 
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;

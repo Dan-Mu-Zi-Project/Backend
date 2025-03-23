@@ -32,17 +32,11 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.ssu.muzi.global.error.code.JwtErrorCode.MEMBER_NOT_FOUND;
-import static com.ssu.muzi.global.error.code.ShareGroupErrorCode.ALREADY_EXISTS_PROGRESSING_GROUP;
-import static com.ssu.muzi.global.error.code.ShareGroupErrorCode.ALREADY_JOINED_GROUP;
-import static com.ssu.muzi.global.error.code.ShareGroupErrorCode.ALREADY_STARTED_TRAVEL;
-import static com.ssu.muzi.global.error.code.ShareGroupErrorCode.ALREADY_STARTED_TRAVEL_NOT_JOIN;
-import static com.ssu.muzi.global.error.code.ShareGroupErrorCode.INVALID_DATE_MODIFICATION;
-import static com.ssu.muzi.global.error.code.ShareGroupErrorCode.LEAVE_NOT_ALLOWED;
-import static com.ssu.muzi.global.error.code.ShareGroupErrorCode.SHARE_GROUP_NOT_FOUND;
-import static com.ssu.muzi.global.error.code.ShareGroupErrorCode.STARTEDAT_AFTER_ENDEDAT;
+import static com.ssu.muzi.global.error.code.ShareGroupErrorCode.*;
 
 @Service
 @Transactional
@@ -355,6 +349,38 @@ public class ShareGroupServiceImpl implements ShareGroupService {
         }
 
         ShareGroup shareGroup = findShareGroup(shareGroupId);
+        return shareGroupConverter.toShareGroupId(shareGroup);
+    }
+
+    // 그룹 삭제 (나밖에 없을 때)
+    @Override
+    public ShareGroupResponse.ShareGroupId deleteShareGroup(Long shareGroupId, Member member) {
+
+        // 1. 그룹 내 모든 활성 Profile 조회하고, 2명 이상이면 에러
+        List<Profile> groupProfileList = profileRepository.findByShareGroupId(shareGroupId);
+        if (groupProfileList.size() > 1) {
+            throw new BusinessException(DELETE_NOT_ALLOWED);
+        }
+
+        // 2. 그룹 조회
+        ShareGroup shareGroup = findShareGroup(shareGroupId);
+
+        // 3. 그룹에 속한 모든 Profile에서, 연결된 모든 PhotoProfileMap을 통해 Photo들을 수집 (중복 제거)
+        Set<Photo> deletePhotoList = shareGroup.getProfileList()
+                .stream()
+                .flatMap(profile -> profile.getPhotoProfileMapList().stream().map(PhotoProfileMap::getPhoto))
+                .collect(Collectors.toSet());
+
+        // 4. 각 Photo에 삭제 (연결된 photoProfileMap, photoLike, photoDownloadMap도 삭제됨)
+        for (Photo photo : deletePhotoList) {
+            photo.delete();
+            photoRepository.save(photo);
+        }
+
+        // 5. 그룹 delete (연관된 프로필 list도 삭제됨)
+        shareGroup.delete();
+        shareGroupRepository.save(shareGroup);
+
         return shareGroupConverter.toShareGroupId(shareGroup);
     }
 
