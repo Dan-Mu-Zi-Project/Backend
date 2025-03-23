@@ -22,4 +22,8 @@ public interface ProfileRepository extends JpaRepository<Profile, Long> {
     // 주어진 shareGroupId에 해당하는 모든 Profile을 조회
     @Query("select p from Profile p where p.shareGroup.id = :shareGroupId and p.deletedAt is null")
     List<Profile> findByShareGroupId(@Param("shareGroupId") Long shareGroupId);
+
+    // 특정 그룹에 속해 있는 프로필의 수 조회
+    @Query("select count(p) from Profile p where p.shareGroup.id = :shareGroupId and p.deletedAt is null")
+    long countActiveProfilesByShareGroupId(@Param("shareGroupId") Long shareGroupId);
 }

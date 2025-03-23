@@ -54,8 +54,8 @@ public class Member extends BaseTimeEntity {
     @Builder.Default
     private List<Profile> profileList = new ArrayList<>();
 
-//    public void delete() {
-//        super.delete();
-//    }
+    @OneToMany(mappedBy = "member")
+    @Builder.Default
+    private List<MemberSampleImage> memberSampleImageList = new ArrayList<>();
 
 }

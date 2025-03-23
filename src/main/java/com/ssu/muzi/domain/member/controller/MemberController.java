@@ -5,12 +5,15 @@ import com.ssu.muzi.domain.member.dto.MemberResponse;
 import com.ssu.muzi.domain.member.entity.Member;
 import com.ssu.muzi.domain.member.service.MemberService;
 import com.ssu.muzi.global.result.ResultResponse;
+import com.ssu.muzi.global.result.code.MemberResultCode;
 import com.ssu.muzi.global.result.code.ShareGroupResultCode;
 import com.ssu.muzi.global.security.annotation.LoginMember;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -69,8 +72,15 @@ public class MemberController {
     @Operation(summary = "샘플 이미지 저장 API", description = "3개의 샘플이미지의 벡터값을 저장하는 API입니다.")
     public ResultResponse<MemberResponse.MemberId> saveSampleImage(@LoginMember Member member,
                                                                    @RequestBody @Valid MemberRequest.SampleImageList request) {
-        return ResultResponse.of(ShareGroupResultCode.SAVE_SAMPLE_IMAGE,
+        return ResultResponse.of(MemberResultCode.SAVE_SAMPLE_IMAGE,
                 memberService.saveSampleImages(member, request));
+    }
+
+    @DeleteMapping
+    @Operation(summary = "회원 탈퇴 API", description = "서비스의 회원을 탈퇴하는 API 입니다.")
+    public ResultResponse<MemberResponse.MemberId> deleteMember(@LoginMember Member member) {
+        return ResultResponse.of(MemberResultCode.DELETE_MEMBER,
+                memberService.deleteMember(member));
     }
 
 }
