@@ -23,5 +23,6 @@ public interface ShareGroupRepository extends JpaRepository<ShareGroup, Long> {
 
     //페이징 처리해서 shareGroup 가져오기
     Page<ShareGroup> findByIdIn(List<Long> shareGroupIds, Pageable pageable);
+
 }
 

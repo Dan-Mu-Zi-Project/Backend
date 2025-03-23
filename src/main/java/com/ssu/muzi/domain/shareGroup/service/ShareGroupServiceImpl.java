@@ -5,9 +5,11 @@ import com.ssu.muzi.domain.member.entity.Member;
 import com.ssu.muzi.domain.member.entity.MemberSampleImage;
 import com.ssu.muzi.domain.member.repository.MemberRepository;
 import com.ssu.muzi.domain.member.repository.MemberSampleImageRepository;
+import com.ssu.muzi.domain.photo.entity.Photo;
 import com.ssu.muzi.domain.photo.entity.PhotoProfileMap;
 import com.ssu.muzi.domain.photo.repository.PhotoDownloadLogRepository;
 import com.ssu.muzi.domain.photo.repository.PhotoProfileMapRepository;
+import com.ssu.muzi.domain.photo.repository.PhotoRepository;
 import com.ssu.muzi.domain.shareGroup.converter.ProfileConverter;
 import com.ssu.muzi.domain.shareGroup.converter.ShareGroupConverter;
 import com.ssu.muzi.domain.shareGroup.dto.ShareGroupRequest;
@@ -38,6 +40,7 @@ import static com.ssu.muzi.global.error.code.ShareGroupErrorCode.ALREADY_JOINED_
 import static com.ssu.muzi.global.error.code.ShareGroupErrorCode.ALREADY_STARTED_TRAVEL;
 import static com.ssu.muzi.global.error.code.ShareGroupErrorCode.ALREADY_STARTED_TRAVEL_NOT_JOIN;
 import static com.ssu.muzi.global.error.code.ShareGroupErrorCode.INVALID_DATE_MODIFICATION;
+import static com.ssu.muzi.global.error.code.ShareGroupErrorCode.LEAVE_NOT_ALLOWED;
 import static com.ssu.muzi.global.error.code.ShareGroupErrorCode.SHARE_GROUP_NOT_FOUND;
 import static com.ssu.muzi.global.error.code.ShareGroupErrorCode.STARTEDAT_AFTER_ENDEDAT;
 
@@ -56,6 +59,7 @@ public class ShareGroupServiceImpl implements ShareGroupService {
     private final ProfileService profileService;
     private final PhotoProfileMapRepository photoProfileMapRepository;
     private final PhotoDownloadLogRepository photoDownloadLogRepository;
+    private final PhotoRepository photoRepository;
 
     @Override
     public ShareGroup createShareGroup(ShareGroupRequest.CreateShareGroupRequest request,
@@ -314,6 +318,44 @@ public class ShareGroupServiceImpl implements ShareGroupService {
                 throw new BusinessException(ALREADY_EXISTS_PROGRESSING_GROUP);
             }
         }
+    }
+
+    // 그룹 탈퇴 (2명 이상일 때)
+    @Override
+    public ShareGroupResponse.ShareGroupId leaveShareGroup(Long shareGroupId, Member member) {
+
+        // 1. 그룹 내 모든 활성 Profile 조회하고, 1명 이하이면 에러
+        List<Profile> groupProfileList = profileRepository.findByShareGroupId(shareGroupId);
+        if (groupProfileList.size() <= 1) {
+            throw new BusinessException(LEAVE_NOT_ALLOWED);
+        }
+
+        // 2. 해당 그룹 내의 내 프로필 조회
+        Profile myProfile = profileService.findProfile(member.getId(), shareGroupId);
+
+        // 3. 내 프로필에 연결된 PhotoProfileMap 목록 조회
+        List<PhotoProfileMap> myMappings = photoProfileMapRepository.findByProfile(myProfile);
+
+        // 4. 내 프로필 soft delete 처리
+        myProfile.delete();
+        profileRepository.save(myProfile);
+
+        for (PhotoProfileMap mapping : myMappings) {
+            // 5. PhotoProfileMap으로 내가 나온 photo를 조회하고,
+            Photo photo = mapping.getPhoto();
+
+            // 6. 활성 매핑 수: 사진에 연결된 프로필 중 활성 프로필(deletedAt이 null) 의 수를 가져옴
+            long activeCount = photoProfileMapRepository.countByPhotoAndProfileDeletedAtIsNull(photo);
+
+            // 7. activeCount가 0이면, 그 사진은 내 프로필 외에 활성 매핑이 없는 경우이므로 soft delete 처리
+            if (activeCount == 0) {
+                photo.delete();
+                photoRepository.save(photo);
+            }
+        }
+
+        ShareGroup shareGroup = findShareGroup(shareGroupId);
+        return shareGroupConverter.toShareGroupId(shareGroup);
     }
 
     @Override
