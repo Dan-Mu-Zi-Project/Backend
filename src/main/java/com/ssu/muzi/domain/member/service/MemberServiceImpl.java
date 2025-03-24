@@ -153,25 +153,7 @@ public class MemberServiceImpl implements MemberService {
             long activeProfileCount = profileRepository.countActiveProfilesByShareGroupId(shareGroupId);
 
             if (activeProfileCount > 1) { // 그룹 내에 내 프로필 외에 다른 회원이 존재할 때 -> 그룹 탈퇴 처리
-
-                // 3. 삭제 전, 내 프로필에 연결된 PhotoProfileMap 목록을 미리 조회
-                List<PhotoProfileMap> myMappings = photoProfileMapRepository.findByProfile(profile);
-
-                // 4. 내 프로필 soft delete 처리
-                profile.delete();
-                profileRepository.save(profile);
-
-                // 5. 각 매핑에 대해, 최신 활성 매핑 수를 재조회
-                for (PhotoProfileMap mapping : myMappings) {
-                    Photo photo = mapping.getPhoto();
-                    // 최신 상태로 활성 매핑 수 조회: 삭제되지 않은(즉, deletedAt == null) 매핑 수
-                    long activeCount = photoProfileMapRepository.countByPhotoAndProfileDeletedAtIsNull(photo);
-                    // 만약 내 프로필 외에 활성 매핑이 없으면 (activeCount == 0), 해당 Photo도 soft delete 처리
-                    if (activeCount == 0) {
-                        photo.delete();
-                        photoRepository.save(photo);
-                    }
-                }
+                shareGroupService.leaveShareGroup(shareGroupId, member);
             } else {
                 // 그룹 내 활성 프로필이 내 프로필만 남은 경우 -> 그룹 삭제 처리
                 shareGroupService.deleteShareGroup(shareGroupId, member);
