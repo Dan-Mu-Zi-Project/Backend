@@ -14,6 +14,8 @@ public enum ShareGroupErrorCode implements ErrorCode {
     INVALID_DATE_MODIFICATION(404, "ES004", "시작 날짜나 종료 날짜는 현재 날짜 이전으로 설정될 수 없어요."),
     ALREADY_JOINED_GROUP(404, "ES005", "이미 참여한 그룹입니다."),
     ALREADY_STARTED_TRAVEL_NOT_JOIN(404, "ES006", "이미 여행이 시작되어 참여할 수 없어요."),
+    LEAVE_NOT_ALLOWED(404, "ES007", "그룹에 본인 제외 최소 1명이 남아 있어야 탈퇴할 수 있습니다. 그룹 삭제를 이용해 주세요."),
+    DELETE_NOT_ALLOWED(404, "ES008", "그룹에 다른 사람이 남아 있으면 그룹을 삭제할 수 없습니다. 그룹 탈퇴를 이용해 주세요."),
     ;
 
     private final int status;

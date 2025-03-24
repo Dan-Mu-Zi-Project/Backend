@@ -275,6 +275,28 @@ public class PhotoServiceImpl implements PhotoService {
         });
     }
 
+    // 사진 삭제
+    @Override
+    public PhotoResponse.PhotoDeleteInfo deletePhotoList(PhotoRequest.PhotoDelete request) {
+
+
+        int deletedCount = 0;
+        for (Long photoId : request.getPhotoIdList()) {
+
+            // 삭제할 각 사진의 엔티티 가져오기
+            Photo photo = findPhoto(photoId);
+
+            // photo 엔티티 삭제
+            // 엔티티의 delete() 메서드가 연관된 모든 엔티티의 delete() 또한 호출함
+            photo.delete();
+            // cascade 설정으로, 다른 레포지토리에도 자동 저장됨
+            photoRepository.save(photo);
+            deletedCount++;
+        }
+
+        return photoConverter.toPhotoDeleteInfo(deletedCount);
+    }
+
 
 
     private Photo findPhoto(Long photoId) {

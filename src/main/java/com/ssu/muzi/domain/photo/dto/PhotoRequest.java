@@ -1,6 +1,7 @@
 package com.ssu.muzi.domain.photo.dto;
 
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -51,6 +52,16 @@ public abstract class PhotoRequest {
     @AllArgsConstructor
     public static class PhotoDownload {
         @NotEmpty(message = "다운로드할 photoId 리스트는 비어있을 수 없습니다.")
+        private List<Long> photoIdList;
+    }
+
+    // 사진 삭제 요청
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class PhotoDelete {
+        @NotEmpty(message = "삭제할 photoIds는 비어있을 수 없습니다.")
         private List<Long> photoIdList;
     }
 }
