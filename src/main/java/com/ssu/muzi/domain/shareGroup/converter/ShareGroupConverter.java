@@ -162,6 +162,7 @@ public class ShareGroupConverter {
         return ShareGroupResponse.ShareGroupPreviewInfo
                 .builder()
                 .shareGroupId(group.getId())
+                .groupColor(group.getGroupColor())
                 .status(status.name())
                 .groupName(group.getGroupName())
                 .description(group.getDescription())

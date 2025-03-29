@@ -113,6 +113,7 @@ public abstract class ShareGroupResponse {
     @AllArgsConstructor
     public static class ShareGroupPreviewInfo {
         private Long shareGroupId;
+        private String groupColor;
         private String status;
         private String groupName;
         private String description;
