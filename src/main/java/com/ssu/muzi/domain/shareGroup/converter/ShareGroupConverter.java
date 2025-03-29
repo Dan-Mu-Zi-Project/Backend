@@ -13,22 +13,36 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
 public class ShareGroupConverter {
 
+    private static final List<String> COLORS = Arrays.asList(
+            "#FFEBEB",
+            "#FFEDD3",
+            "#FFF4CD",
+            "#DDECF6",
+            "#DDECDB",
+            "#E4E7FA"
+    );
+
     // 그룹 생성 요청 받은 그룹을 엔티티로 변환
     public ShareGroup toShareGroupEntity(ShareGroupRequest.CreateShareGroupRequest request, Member member) {
+        // 무작위 색상 선택
+        String randomColor = COLORS.get(new Random().nextInt(COLORS.size()));
+
         return ShareGroup.builder()
                 .groupName(request.getGroupName())             // 요청에서 받은 그룹명
                 .description(request.getDescription()) // 요청에서 받은 그룹 소개
                 .place(request.getPlace())
                 .startedAt(request.getStartedAt())
                 .endedAt(request.getEndedAt())
-                .groupColor("#FFF4CD")
+                .groupColor(randomColor) // 랜덤
                 .groupImageUrl("https://muzi-photo.s3.ap-northeast-2.amazonaws.com/groupImage/basicGroupImage.png")
                 .ownerName(member.getName())
                 .ownerImageUrl(member.getMemberImageUrl())
