@@ -1,6 +1,5 @@
 package com.ssu.muzi.domain.shareGroup.service;
 
-import com.ssu.muzi.domain.member.entity.Member;
 import com.ssu.muzi.domain.shareGroup.entity.Profile;
 import com.ssu.muzi.domain.shareGroup.repository.ProfileRepository;
 import com.ssu.muzi.global.error.BusinessException;
