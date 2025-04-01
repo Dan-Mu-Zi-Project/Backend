@@ -53,11 +53,11 @@ public class GalleryController {
     @PostMapping("/{shareGroupId}/{photoId}/like")
     @Operation(summary = "사진 좋아요 누르기 API",
             description = "특정 사진에 좋아요 기록을 남깁니다. 같은 사용자가 같은 사진에 여러 번 좋아요를 누를 수 없습니다.")
-    public ResultResponse<PhotoResponse.PhotoId> likePhoto(@PathVariable Long photoId,
-                                                           @PathVariable Long shareGroupId,
+    public ResultResponse<PhotoResponse.PhotoId> likePhoto(@PathVariable Long shareGroupId,
+                                                           @PathVariable Long photoId,
                                                            @LoginMember Member member) {
         return ResultResponse.of(PHOTO_LIKE,
-                photoService.likePhoto(photoId, shareGroupId, member));
+                photoService.likePhoto(shareGroupId, photoId, member));
     }
 
     @DeleteMapping("/{shareGroupId}/{photoId}/cancelLike")
@@ -67,7 +67,7 @@ public class GalleryController {
                                                             @PathVariable Long photoId,
                                                             @LoginMember Member member) {
         return ResultResponse.of(CANCEL_LIKE,
-                photoService.cancelLike(photoId, shareGroupId, member));
+                photoService.cancelLike(shareGroupId, photoId, member));
     }
 
     // 특정 profile의 앨범 안의 사진 리스트 조회

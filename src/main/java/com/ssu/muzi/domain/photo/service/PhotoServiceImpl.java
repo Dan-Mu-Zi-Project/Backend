@@ -188,7 +188,7 @@ public class PhotoServiceImpl implements PhotoService {
 
     // 특정 photoId에 대해, 로그인한 사용자의 기본 Profile을 기준으로 좋아요를 기록
     @Override
-    public PhotoResponse.PhotoId likePhoto(Long photoId, Long shareGroupId, Member member) {
+    public PhotoResponse.PhotoId likePhoto(Long shareGroupId, Long photoId, Member member) {
 
         // 1. 로그인한 사용자의 Profile을 조회
         Profile profile = profileService.findProfile(member.getId(), shareGroupId);
