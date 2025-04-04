@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import static com.ssu.muzi.global.result.code.MemberResultCode.CHECK_MEMBER_REGISTRATION;
+import static com.ssu.muzi.global.result.code.MemberResultCode.EXHIBITION_ADD;
 import static com.ssu.muzi.global.result.code.MemberResultCode.LOGIN;
 import static com.ssu.muzi.global.result.code.MemberResultCode.REFRESH_TOKEN;
 
@@ -49,4 +50,14 @@ public class OauthController {
     public ResultResponse<OauthResponse.CheckMemberRegistration> checkSignup(@Valid @RequestBody OauthRequest.LoginRequest request) {
         return ResultResponse.of(CHECK_MEMBER_REGISTRATION, oauthService.checkRegistration(request));
     }
+
+    // 전시용 회원가입
+    @PostMapping("/login/add-exhibition")
+    @Operation(summary = "전시용 회원가입 API", description = "전시용 회원가입을 진행하는 API 입니다.")
+    public ResultResponse<OauthResponse.ServerAccessTokenInfo> exhibitionAdd(@Valid @RequestBody OauthRequest.ExhibitionAddRequest request) {
+        return ResultResponse.of(EXHIBITION_ADD, oauthService.exhibitionAdd(request));
+    }
+
+
+
 }
