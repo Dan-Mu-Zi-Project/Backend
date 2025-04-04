@@ -18,6 +18,7 @@ public enum MemberResultCode implements ResultCode {
     DELETE_MEMBER(200, "SM008", "성공적으로 회원 탈퇴했습니다."),
     EXHIBITION_LOGIN(200, "SM009", "성공적으로 전시용 로그인했습니다."),
     EXHIBITION_ADD(200, "SM010", "성공적으로 전시용 회원가입했습니다."),
+    CHECK_LOGIN_ID(200, "SM011", "성공적으로 아이디 중복 여부를 체크하였습니다."),
     ;
     private final int status;
     private final String code;

@@ -80,4 +80,12 @@ public class MemberConverter {
                 .build();
     }
 
+    // 전시용 아이디 중복 확인
+    public static OauthResponse.CheckLoginIdResponse toCheckLoginIdResponse(boolean isAvailable) {
+        return OauthResponse.CheckLoginIdResponse
+                .builder()
+                .isAvailable(isAvailable)
+                .build();
+    }
+
 }

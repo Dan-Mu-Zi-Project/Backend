@@ -188,4 +188,12 @@ public class OauthServiceImpl implements OauthService {
         return memberConverter.toServerAccessTokenInfo(accessToken, member);
     }
 
+    @Override
+    // 아이디 중복확인
+    public OauthResponse.CheckLoginIdResponse checkLoginId(String loginId) {
+        // loginId로 회원이 존재하는지 확인
+        boolean isAvailable = memberRepository.findByLoginId(loginId).isEmpty();
+        return MemberConverter.toCheckLoginIdResponse(isAvailable);
+    }
+
 }

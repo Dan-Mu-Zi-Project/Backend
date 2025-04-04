@@ -10,12 +10,18 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.RequiredArgsConstructor;
+import lombok.Value;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import static com.ssu.muzi.global.result.code.MemberResultCode.CHECK_LOGIN_ID;
 import static com.ssu.muzi.global.result.code.MemberResultCode.CHECK_MEMBER_REGISTRATION;
 import static com.ssu.muzi.global.result.code.MemberResultCode.EXHIBITION_ADD;
 import static com.ssu.muzi.global.result.code.MemberResultCode.EXHIBITION_LOGIN;
@@ -64,5 +70,12 @@ public class OauthController {
     @Operation(summary = "전시용 로그인 API", description = "전시용 로그인 API입니다.")
     public ResultResponse<OauthResponse.ServerAccessTokenInfo> exhibitionLogin(@Valid @RequestBody OauthRequest.ExhibitionLoginRequest request) {
         return ResultResponse.of(EXHIBITION_LOGIN, oauthService.exhibitionLogin(request));
+    }
+
+    // 전시용 - 아이디 중복 검증
+    @GetMapping("/login/check-loginId")
+    @Operation(summary = "아이디 중복 검증 API", description = "입력된 loginId가 이미 존재하는지 확인하는 API입니다.")
+    public ResultResponse<OauthResponse.CheckLoginIdResponse> checkLoginId(@RequestParam @NotEmpty(message = "아이디는 필수로 입력해야 합니다.") String loginId) {
+        return ResultResponse.of(CHECK_LOGIN_ID, oauthService.checkLoginId(loginId));
     }
 }
