@@ -38,4 +38,13 @@ public abstract class  OauthResponse {
     public static class RefreshTokenResponse {
         private String accessToken;
     }
+
+    // id 중복 검증
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    public static class CheckLoginIdResponse {
+        private boolean isAvailable;
+    }
 }

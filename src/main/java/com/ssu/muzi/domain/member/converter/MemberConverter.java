@@ -1,9 +1,12 @@
 package com.ssu.muzi.domain.member.converter;
 
 import com.ssu.muzi.domain.member.dto.MemberResponse;
+import com.ssu.muzi.domain.member.dto.OauthRequest;
 import com.ssu.muzi.domain.member.dto.OauthResponse;
 import com.ssu.muzi.domain.member.entity.Member;
 import org.springframework.stereotype.Component;
+
+import java.util.UUID;
 
 @Component
 public class MemberConverter {
@@ -58,6 +61,30 @@ public class MemberConverter {
         return MemberResponse.MemberId
                 .builder()
                 .memberId(member.getId())
+                .build();
+    }
+
+    // 전시용 회원가입 시
+    public static Member toExhibitionMember(OauthRequest.ExhibitionAddRequest request) {
+
+        Long authId = Math.abs(UUID.randomUUID().getMostSignificantBits());
+
+        return Member.builder()
+                .loginId(request.getLoginId())
+                .loginPassword(request.getLoginPassword())
+                .name(request.getName())
+                .isFaceCaptured(false)
+                .onlyWifi(false)
+                .email(null)
+                .authId(authId)
+                .build();
+    }
+
+    // 전시용 아이디 중복 확인
+    public static OauthResponse.CheckLoginIdResponse toCheckLoginIdResponse(boolean isAvailable) {
+        return OauthResponse.CheckLoginIdResponse
+                .builder()
+                .isAvailable(isAvailable)
                 .build();
     }
 

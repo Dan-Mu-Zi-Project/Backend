@@ -6,6 +6,7 @@ import com.ssu.muzi.domain.member.dto.OauthResponse;
 import com.ssu.muzi.domain.member.entity.Member;
 import com.ssu.muzi.domain.member.repository.MemberRepository;
 import com.ssu.muzi.global.error.BusinessException;
+import com.ssu.muzi.global.error.code.OauthErrorCode;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -17,6 +18,10 @@ import java.util.Arrays;
 
 import static com.ssu.muzi.global.error.code.JwtErrorCode.INVALID_REFRESH_TOKEN;
 import static com.ssu.muzi.global.error.code.JwtErrorCode.MEMBER_NOT_FOUND;
+import static com.ssu.muzi.global.error.code.OauthErrorCode.DUPLICATE_LOGIN_ID;
+import static com.ssu.muzi.global.error.code.OauthErrorCode.INVALID_PASSWORD;
+import static com.ssu.muzi.global.error.code.OauthErrorCode.MEMBER_LOGINID_NOT_FOUND;
+import static com.ssu.muzi.global.error.code.OauthErrorCode.NOT_CORRECT_PASSWORD;
 
 
 @Service
@@ -131,4 +136,64 @@ public class OauthServiceImpl implements OauthService {
         // 유효한 Refresh Token을 기반으로 새로운 Access Token을 생성하여 반환
         return jwtTokenService.createAccessToken(member.getAuthId().toString());
     }
+
+    @Override
+    // 전시용 회원가입 시 처리하는 로직
+    public OauthResponse.ServerAccessTokenInfo exhibitionAdd(OauthRequest.ExhibitionAddRequest request) {
+        // 아이디 중복 검증
+        String loginId = request.getLoginId();
+        if (memberRepository.findByLoginId(loginId).isPresent()) {
+            throw new BusinessException(DUPLICATE_LOGIN_ID);
+        }
+
+        // 비밀번호 길이 검증
+        if (request.getLoginPassword() == null || request.getLoginPassword().length() < 8) {
+            throw new BusinessException(INVALID_PASSWORD);
+        }
+
+        // 컨버터를 사용해 request에서 Member 엔티티 생성
+        Member member = MemberConverter.toExhibitionMember(request);
+        member.setMemberImageUrl("https://muzi-photo.s3.ap-northeast-2.amazonaws.com/memberImage/basicMemberImage.png");
+
+        // 회원 저장
+        member = memberRepository.save(member);
+
+        // 회원가입 성공 시, member의 loginId를 payload로 JWT 액세스 토큰 생성 + 리프레쉬 토큰
+        String accessToken = jwtTokenService.createAccessToken(member.getAuthId().toString());
+        String refreshToken = jwtTokenService.createRefreshToken();
+        member.setAccessToken(accessToken);
+        member.setRefreshToken(refreshToken);
+
+        return memberConverter.toServerAccessTokenInfo(accessToken, member);
+    }
+
+
+    @Override
+    // 전시용 로그인 시 처리하는 로직
+    public OauthResponse.ServerAccessTokenInfo exhibitionLogin(OauthRequest.ExhibitionLoginRequest request) {
+
+        // 아이디(로그인ID)로 회원 조회
+        Member member = memberRepository.findByLoginId(request.getLoginId())
+                .orElseThrow(() -> new BusinessException(MEMBER_LOGINID_NOT_FOUND));
+
+        // 비밀번호 검증
+        if (!member.getLoginPassword().equals(request.getLoginPassword())) {
+            throw new BusinessException(NOT_CORRECT_PASSWORD);
+        }
+
+        // 기존 액세스 토큰 확인
+        String accessToken = member.getAccessToken();
+
+        // 응답 DTO 생성
+        return memberConverter.toServerAccessTokenInfo(accessToken, member);
+    }
+
+    @Override
+    // 아이디 중복확인
+    public OauthResponse.CheckLoginIdResponse checkLoginId(String loginId) {
+        // loginId로 회원이 존재하는지 확인
+        boolean isAvailable = memberRepository.findByLoginId(loginId).isEmpty();
+        return MemberConverter.toCheckLoginIdResponse(isAvailable);
+    }
+
 }

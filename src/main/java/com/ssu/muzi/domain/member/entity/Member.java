@@ -49,6 +49,10 @@ public class Member extends BaseTimeEntity {
     private String accessToken;      // Access Token
     @Column
     private String email;      // Access Token
+    @Column
+    private String loginId;     // 전시용
+    @Column
+    private String loginPassword;      // 전시용
 
     @OneToMany(mappedBy = "member")
     @Builder.Default
