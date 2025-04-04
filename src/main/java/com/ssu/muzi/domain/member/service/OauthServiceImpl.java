@@ -20,6 +20,8 @@ import static com.ssu.muzi.global.error.code.JwtErrorCode.INVALID_REFRESH_TOKEN;
 import static com.ssu.muzi.global.error.code.JwtErrorCode.MEMBER_NOT_FOUND;
 import static com.ssu.muzi.global.error.code.OauthErrorCode.DUPLICATE_LOGIN_ID;
 import static com.ssu.muzi.global.error.code.OauthErrorCode.INVALID_PASSWORD;
+import static com.ssu.muzi.global.error.code.OauthErrorCode.MEMBER_LOGINID_NOT_FOUND;
+import static com.ssu.muzi.global.error.code.OauthErrorCode.NOT_CORRECT_PASSWORD;
 
 
 @Service
@@ -162,6 +164,27 @@ public class OauthServiceImpl implements OauthService {
         member.setAccessToken(accessToken);
         member.setRefreshToken(refreshToken);
 
+        return memberConverter.toServerAccessTokenInfo(accessToken, member);
+    }
+
+
+    @Override
+    // 전시용 로그인 시 처리하는 로직
+    public OauthResponse.ServerAccessTokenInfo exhibitionLogin(OauthRequest.ExhibitionLoginRequest request) {
+
+        // 아이디(로그인ID)로 회원 조회
+        Member member = memberRepository.findByLoginId(request.getLoginId())
+                .orElseThrow(() -> new BusinessException(MEMBER_LOGINID_NOT_FOUND));
+
+        // 비밀번호 검증
+        if (!member.getLoginPassword().equals(request.getLoginPassword())) {
+            throw new BusinessException(NOT_CORRECT_PASSWORD);
+        }
+
+        // 기존 액세스 토큰 확인
+        String accessToken = member.getAccessToken();
+
+        // 응답 DTO 생성
         return memberConverter.toServerAccessTokenInfo(accessToken, member);
     }
 

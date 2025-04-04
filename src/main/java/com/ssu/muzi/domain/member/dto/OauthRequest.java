@@ -40,4 +40,17 @@ public abstract class OauthRequest {
         @Size(min = 8, message = "비밀번호는 8자 이상 입력해야 합니다.")
         private String loginPassword;
     }
+
+    // 전시용 로그인
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ExhibitionLoginRequest {
+        @NotEmpty(message = "아이디 필수로 입력해야 합니다.")
+        private String loginId;
+        @NotEmpty(message = "비밀번호는 필수로 입력해야 합니다.")
+        @Size(min = 8, message = "비밀번호는 8자 이상 입력해야 합니다.")
+        private String loginPassword;
+    }
 }

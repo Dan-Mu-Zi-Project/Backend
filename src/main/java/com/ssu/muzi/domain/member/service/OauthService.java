@@ -14,4 +14,5 @@ public interface OauthService {
     OauthResponse.RefreshTokenResponse tokenRefresh(HttpServletRequest request);
     OauthResponse.CheckMemberRegistration checkRegistration(OauthRequest.LoginRequest request);
     OauthResponse.ServerAccessTokenInfo exhibitionAdd(OauthRequest.ExhibitionAddRequest request);
+    OauthResponse.ServerAccessTokenInfo exhibitionLogin(OauthRequest.ExhibitionLoginRequest request);
 }
