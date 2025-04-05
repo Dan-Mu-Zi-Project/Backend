@@ -137,6 +137,8 @@ public class PhotoConverter {
                 .photoUrl(photo.getPhotoUrl())
                 .isLikedByUser(isLikedByUser)
                 .isDownloadedByUser(isDownloadedByUser)
+                .width(photo.getWidth())
+                .width(photo.getHeight())
                 .build();
     }
 

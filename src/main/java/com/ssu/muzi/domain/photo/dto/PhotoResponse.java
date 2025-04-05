@@ -96,6 +96,8 @@ public abstract class PhotoResponse {
         private String photoUrl;
         private boolean isLikedByUser;
         private boolean isDownloadedByUser;
+        private Integer width;
+        private Integer height;
     }
 
     // 사진 id를 응답
