@@ -22,10 +22,10 @@ public class SwaggerConfig {
         SecurityRequirement securityRequirement = new SecurityRequirement().addList("bearerAuth");
 
         Server server = new Server();
-        server.setUrl("http://52.79.135.67:8081");
+        server.setUrl("http://danmuzi.codns.com:443");
 
         Server local = new Server();
-        local.setUrl("http://localhost:8081");
+        local.setUrl("http://localhost:443");
 
         return new OpenAPI()
                 .components(new Components().addSecuritySchemes("bearerAuth", securityScheme))
