@@ -22,7 +22,7 @@ public class SwaggerConfig {
         SecurityRequirement securityRequirement = new SecurityRequirement().addList("bearerAuth");
 
         Server server = new Server();
-        server.setUrl("http://danmuzi.codns.com:443");
+        server.setUrl("https://danmuzi.codns.com:443");
 
         Server local = new Server();
         local.setUrl("http://localhost:443");
