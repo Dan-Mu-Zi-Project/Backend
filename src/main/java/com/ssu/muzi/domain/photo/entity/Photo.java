@@ -40,6 +40,10 @@ public class Photo extends BaseTimeEntity {
     private String location;
     @Column(name = "take_at")
     private LocalDateTime takeAt; // 찍은 시간
+    @Column(name = "width")
+    private Integer width;
+    @Column(name = "height")
+    private Integer height;
     @Column(name = "uploader_profile_id", nullable = false)
     private Long uploaderProfileId;
 

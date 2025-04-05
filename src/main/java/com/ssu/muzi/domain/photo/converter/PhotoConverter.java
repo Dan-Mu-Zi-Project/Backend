@@ -63,6 +63,8 @@ public class PhotoConverter {
                 .location(photoUpload.getLocation())
                 .takeAt(takeAt)
                 .uploaderProfileId(uploaderProfileId)
+                .width(photoUpload.getWidth())
+                .height(photoUpload.getHeight())
                 .build();
     }
 

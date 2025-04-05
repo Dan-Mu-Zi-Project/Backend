@@ -43,6 +43,8 @@ public abstract class PhotoRequest {
         private List<Long> profileIdList;
         private String location;
         private String takedAt;
+        private Integer width;
+        private Integer height;
     }
 
     // 사진 다운로드 요청
