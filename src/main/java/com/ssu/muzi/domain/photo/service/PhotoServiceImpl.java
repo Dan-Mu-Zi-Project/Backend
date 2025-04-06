@@ -20,6 +20,8 @@ import com.ssu.muzi.domain.photo.repository.PhotoRepository;
 import com.ssu.muzi.domain.shareGroup.entity.Profile;
 import com.ssu.muzi.domain.shareGroup.service.ProfileService;
 import com.ssu.muzi.global.error.BusinessException;
+import com.ssu.muzi.global.error.code.ProfileErrorCode;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -244,7 +246,17 @@ public class PhotoServiceImpl implements PhotoService {
         Photo photo = findPhoto(photoId);
 
         // 2. 업로더 프로필 조회 (Photo 엔티티에 저장된 uploaderProfileId 사용)
-        Profile uploaderProfile = profileService.findProfile(photo.getUploaderProfileId());
+        // 없으면 null 처리 (탈퇴한 사용자일수도 있으므로)
+        Profile uploaderProfile;
+        try {
+            uploaderProfile = profileService.findProfile(photo.getUploaderProfileId());
+        } catch (BusinessException e) {
+            if (e.getErrorCode() == ProfileErrorCode.PROFILE_NOT_FOUND) { // 찾을 수 없으면 빈 프로필 던짐
+                uploaderProfile = createEmptyProfile();
+            } else {
+                throw e; // 다른 에러는 그대로 던짐
+            }
+        }
 
         // 3. 참여자 프로필 조회: PhotoProfileMap을 통해 해당 Photo에 매핑된 모든 Profile 조회
         List<PhotoProfileMap> mappingList = photoProfileMapRepository.findByPhoto(photo);
@@ -303,6 +315,18 @@ public class PhotoServiceImpl implements PhotoService {
     private Photo findPhoto(Long photoId) {
         return photoRepository.findById(photoId)
                 .orElseThrow(() -> new BusinessException(PHOTO_NOT_FOUND));
+    }
+
+    private Profile createEmptyProfile() {
+        Member emptyMember = Member.builder()
+                .name("")
+                .memberImageUrl("")
+                .build();
+
+        return Profile.builder()
+                .id(null)
+                .member(emptyMember)
+                .build();
     }
 
 }
