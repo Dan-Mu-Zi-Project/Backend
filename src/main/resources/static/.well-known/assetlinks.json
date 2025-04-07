@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.example.danmuji",
+      "sha256_cert_fingerprints": [
+        "8D:0D:0D:91:91:C2:6C:FA:49:72:8B:0E:BE:89:D1:DF:61:65:8E:C8:2F:72:E5:CF:04:1D:E4:55:C0:97:8E:EF"
+      ]
+    }
+  }
+]
