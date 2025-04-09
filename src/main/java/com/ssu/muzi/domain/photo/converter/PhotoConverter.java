@@ -56,7 +56,14 @@ public class PhotoConverter {
 
     // 프론트에서 요청온 photo 를 엔티티로 변환하는 로직
     public Photo toPhotoEntity(PhotoRequest.PhotoUpload photoUpload, Long uploaderProfileId) {
-        LocalDateTime takeAt = LocalDateTime.parse(photoUpload.getTakedAt(), DATE_FORMATTER);
+        LocalDateTime takeAt = null;
+        if (photoUpload.getTakedAt() != null && !photoUpload.getTakedAt().trim().isEmpty()) {
+            try {
+                takeAt = LocalDateTime.parse(photoUpload.getTakedAt(), DATE_FORMATTER);
+            } catch (Exception e) {
+                // 파싱에 실패하면 null로 유지
+            }
+        }
 
         return Photo.builder()
                 .photoUrl(photoUpload.getImageUrl())
