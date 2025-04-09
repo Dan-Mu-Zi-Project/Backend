@@ -385,6 +385,14 @@ public class ShareGroupServiceImpl implements ShareGroupService {
     }
 
     @Override
+    public ShareGroupResponse.ShareGroupId getCurrentGroup() {
+        LocalDateTime now = LocalDateTime.now();
+        ShareGroup currentGroup = shareGroupRepository.findCurrentGroup(now)
+                .orElseThrow(() -> new BusinessException(NOT_EXIST_CURRENT_GROUP));
+        return shareGroupConverter.toShareGroupId(currentGroup);
+    }
+
+    @Override
     public ShareGroup findShareGroup(Long shareGroupId) {
         return shareGroupRepository.findById(shareGroupId)
                 .orElseThrow(() -> new BusinessException(SHARE_GROUP_NOT_FOUND));

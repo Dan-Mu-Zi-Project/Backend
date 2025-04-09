@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ShareGroupRepository extends JpaRepository<ShareGroup, Long> {
@@ -23,6 +24,10 @@ public interface ShareGroupRepository extends JpaRepository<ShareGroup, Long> {
 
     //페이징 처리해서 shareGroup 가져오기
     Page<ShareGroup> findByIdIn(List<Long> shareGroupIds, Pageable pageable);
+
+    // 현재 진행중인 그룹
+    @Query("select sg from ShareGroup sg where sg.startedAt <= :now and sg.endedAt >= :now")
+    Optional<ShareGroup> findCurrentGroup(@Param("now") LocalDateTime now);
 
 }
 

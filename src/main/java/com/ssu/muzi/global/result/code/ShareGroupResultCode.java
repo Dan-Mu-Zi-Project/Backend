@@ -17,7 +17,8 @@ public enum ShareGroupResultCode implements ResultCode {
     UPLOAD_GROUPIMAGE(200, "SG009", "성공적으로 그룹 이미지를 업로드하였습니다."),
     SHARE_GROUP_LIST_INFO(200, "SG010", "성공적으로 그룹 리스트를 조회했습니다."),
     LEAVE_SHARE_GROUP(200, "SG011", "성공적으로 그룹을 탈퇴했습니다."),
-    DELETE_SHARE_GROUP(200, "SH012", "성공적으로 그룹을 삭제했습니다."),
+    DELETE_SHARE_GROUP(200, "SG012", "성공적으로 그룹을 삭제했습니다."),
+    GROUP_CURRENT(200, "SG013", "성공적으로 현재 진행중인 그룹을 반환했습니다.")
     ;
     private final int status;
     private final String code;

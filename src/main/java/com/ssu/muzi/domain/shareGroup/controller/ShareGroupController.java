@@ -29,6 +29,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import static com.ssu.muzi.global.result.code.ShareGroupResultCode.GROUP_CURRENT;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/shareGroups")
@@ -145,6 +147,15 @@ public class ShareGroupController {
                                                                            @LoginMember Member member) {
         return ResultResponse.of(ShareGroupResultCode.DELETE_SHARE_GROUP,
                 shareGroupService.deleteShareGroup(shareGroupId, member));
+    }
+
+    // 현재 진행중 그룹
+    @GetMapping("/current")
+    @Operation(summary = "현재 진행 중인 그룹 조회 API",
+            description = "현재 시간이 그룹의 시작일과 종료일 사이에 있는 공유 그룹의 ID를 반환합니다.")
+    public ResultResponse<ShareGroupResponse.ShareGroupId> getCurrentGroup() {
+        return ResultResponse.of(GROUP_CURRENT,
+                shareGroupService.getCurrentGroup());
     }
 
 

@@ -16,6 +16,7 @@ public enum ShareGroupErrorCode implements ErrorCode {
     ALREADY_STARTED_TRAVEL_NOT_JOIN(404, "ES006", "이미 여행이 시작되어 참여할 수 없어요."),
     LEAVE_NOT_ALLOWED(404, "ES007", "그룹에 본인 제외 최소 1명이 남아 있어야 탈퇴할 수 있습니다. 그룹 삭제를 이용해 주세요."),
     DELETE_NOT_ALLOWED(404, "ES008", "그룹에 다른 사람이 남아 있으면 그룹을 삭제할 수 없습니다. 그룹 탈퇴를 이용해 주세요."),
+    NOT_EXIST_CURRENT_GROUP(404, "ES009", "현재 진행중인 그룹이 없습니다.")
     ;
 
     private final int status;
