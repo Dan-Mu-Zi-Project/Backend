@@ -385,9 +385,22 @@ public class ShareGroupServiceImpl implements ShareGroupService {
     }
 
     @Override
-    public ShareGroupResponse.ShareGroupId getCurrentGroup() {
+    public ShareGroupResponse.ShareGroupId getCurrentGroup(Member member) {
+
+        // 해당 멤버의 논리 삭제되지 않은 모든 프로필에서 참여 중인 공유 그룹 ID 추출
+        List<Long> shareGroupIdList = profileRepository.findByMemberId(member.getId())
+                .stream()
+                .map(profile -> profile.getShareGroup().getId())
+                .distinct()
+                .toList();
+
+        if (shareGroupIdList.isEmpty()) {
+            throw new BusinessException(NOT_EXIST_CURRENT_GROUP);
+        }
+
         LocalDateTime now = LocalDateTime.now();
-        ShareGroup currentGroup = shareGroupRepository.findCurrentGroup(now)
+
+        ShareGroup currentGroup = shareGroupRepository.findCurrentGroup(shareGroupIdList, now)
                 .orElseThrow(() -> new BusinessException(NOT_EXIST_CURRENT_GROUP));
         return shareGroupConverter.toShareGroupId(currentGroup);
     }

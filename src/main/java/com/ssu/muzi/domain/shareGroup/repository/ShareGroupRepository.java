@@ -26,8 +26,14 @@ public interface ShareGroupRepository extends JpaRepository<ShareGroup, Long> {
     Page<ShareGroup> findByIdIn(List<Long> shareGroupIds, Pageable pageable);
 
     // 현재 진행중인 그룹
-    @Query("select sg from ShareGroup sg where sg.startedAt <= :now and sg.endedAt >= :now")
-    Optional<ShareGroup> findCurrentGroup(@Param("now") LocalDateTime now);
+    @Query("""
+    SELECT sg FROM ShareGroup sg
+    WHERE sg.id IN :ids
+      AND sg.startedAt <= :now
+      AND sg.endedAt >= :now
+    """)
+    Optional<ShareGroup> findCurrentGroup(@Param("ids") List<Long> shareGropIds,
+                                          @Param("now") LocalDateTime now);
 
 }
 

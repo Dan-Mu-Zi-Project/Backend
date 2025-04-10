@@ -19,5 +19,5 @@ public interface ShareGroupService {
     Page<ShareGroupResponse.ShareGroupPreviewInfo> getMyShareGroupList(Member member, Pageable pageable);
     ShareGroupResponse.ShareGroupId leaveShareGroup(Long shareGroupId, Member member);
     ShareGroupResponse.ShareGroupId deleteShareGroup(Long shareGroupId, Member member);
-    ShareGroupResponse.ShareGroupId getCurrentGroup();
+    ShareGroupResponse.ShareGroupId getCurrentGroup(Member member);
 }

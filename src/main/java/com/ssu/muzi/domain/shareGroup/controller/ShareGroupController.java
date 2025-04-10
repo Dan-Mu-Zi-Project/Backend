@@ -153,9 +153,9 @@ public class ShareGroupController {
     @GetMapping("/current")
     @Operation(summary = "현재 진행 중인 그룹 조회 API",
             description = "현재 시간이 그룹의 시작일과 종료일 사이에 있는 공유 그룹의 ID를 반환합니다.")
-    public ResultResponse<ShareGroupResponse.ShareGroupId> getCurrentGroup() {
+    public ResultResponse<ShareGroupResponse.ShareGroupId> getCurrentGroup(@LoginMember Member member) {
         return ResultResponse.of(GROUP_CURRENT,
-                shareGroupService.getCurrentGroup());
+                shareGroupService.getCurrentGroup(member));
     }
 
 
