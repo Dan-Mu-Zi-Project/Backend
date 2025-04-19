@@ -251,6 +251,7 @@ public class ShareGroupServiceImpl implements ShareGroupService {
                 // 그룹 상태 계산
                 Status status = computeGroupStatus(group, now);
 
+                assert status != null;
                 return shareGroupConverter.toShareGroupPreview(group, status, downloadCount, entireCount);
         }).collect(Collectors.toList());
 
@@ -268,7 +269,7 @@ public class ShareGroupServiceImpl implements ShareGroupService {
         } else if (now.isBefore(group.getEndedAt().plusDays(7))) {
             return Status.RECENTLY_ENDED;
         } else {
-            return null; // 홈 화면에 표시하지 않을 그룹
+            return Status.FINAL_ENDED;
         }
     }
 
