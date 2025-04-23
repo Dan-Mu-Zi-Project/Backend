@@ -173,11 +173,14 @@ public class ShareGroupConverter {
 
     // 내가 속한 전체 그룹 조회 (프리뷰) 시, "그룹 하나"에 대한 응답
     public ShareGroupResponse.ShareGroupPreviewInfo toShareGroupPreview (ShareGroup group, Status status, long downloadCount, long entireCount) {
+
+        String statusStr = (status != null ? status.name() : Status.FINAL_ENDED.name());
+
         return ShareGroupResponse.ShareGroupPreviewInfo
                 .builder()
                 .shareGroupId(group.getId())
                 .groupColor(group.getGroupColor())
-                .status(status.name())
+                .status(statusStr)
                 .groupName(group.getGroupName())
                 .description(group.getDescription())
                 .startedAt(group.getStartedAt())
