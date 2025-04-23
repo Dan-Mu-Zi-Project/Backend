@@ -157,6 +157,6 @@ public class ShareGroupController {
         return ResultResponse.of(GROUP_CURRENT,
                 shareGroupService.getCurrentGroup(member));
     }
-
+//
 
 }
