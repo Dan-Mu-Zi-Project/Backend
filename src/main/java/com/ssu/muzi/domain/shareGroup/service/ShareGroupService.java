@@ -5,8 +5,11 @@ import com.ssu.muzi.domain.shareGroup.dto.ShareGroupRequest;
 import com.ssu.muzi.domain.shareGroup.dto.ShareGroupResponse;
 import com.ssu.muzi.domain.shareGroup.entity.Profile;
 import com.ssu.muzi.domain.shareGroup.entity.ShareGroup;
+import com.ssu.muzi.domain.shareGroup.entity.Status;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+
+import java.time.LocalDateTime;
 
 public interface ShareGroupService {
     ShareGroup createShareGroup(ShareGroupRequest.CreateShareGroupRequest request, Member member);
@@ -20,4 +23,5 @@ public interface ShareGroupService {
     ShareGroupResponse.ShareGroupId leaveShareGroup(Long shareGroupId, Member member);
     ShareGroupResponse.ShareGroupId deleteShareGroup(Long shareGroupId, Member member);
     ShareGroupResponse.ShareGroupId getCurrentGroup(Member member);
+    Status computeGroupStatus(ShareGroup group, LocalDateTime now);
 }
