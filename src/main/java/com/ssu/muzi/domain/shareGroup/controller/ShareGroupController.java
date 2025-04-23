@@ -158,7 +158,7 @@ public class ShareGroupController {
                 shareGroupService.getCurrentGroup(member));
     }
 
-
+    //.
 
 
 }
