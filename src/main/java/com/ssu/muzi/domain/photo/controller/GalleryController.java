@@ -87,4 +87,6 @@ public class GalleryController {
         return ResultResponse.of(PhotoResultCode.PHOTO_LIST_INFO,
                 photoConverter.toPagedPhotoInfo(photoList, shareGroupId, profileId));
     }
+
+
 }
