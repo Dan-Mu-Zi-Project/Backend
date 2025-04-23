@@ -13,4 +13,5 @@ public interface PhotoDownloadLogRepository extends JpaRepository<PhotoDownloadL
     // 해당 Profile과, 주어진 photo id 목록에 해당하는 다운로드 레코드 수 계산
     long countByProfileAndPhotoIdIn(Profile profile, List<Long> photoIds);
     boolean existsByProfileAndPhoto(Profile profile, Photo photo);
+    long countByProfile(Profile profile);
 }

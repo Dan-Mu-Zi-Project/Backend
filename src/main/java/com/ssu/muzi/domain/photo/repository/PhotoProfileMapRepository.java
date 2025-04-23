@@ -18,5 +18,6 @@ public interface PhotoProfileMapRepository extends JpaRepository<PhotoProfileMap
     List<PhotoProfileMap> findByPhoto(Photo photo);
     // photo에 엮인 활성 프로필 수 개수 새기
     @Query("select count(ppm) from PhotoProfileMap ppm where ppm.photo = :photo and ppm.profile.deletedAt is null")
-    long countByPhotoAndProfileDeletedAtIsNull(@Param("photo") Photo photo);;
+    long countByPhotoAndProfileDeletedAtIsNull(@Param("photo") Photo photo);
+    long countByProfile(Profile profile);
 }

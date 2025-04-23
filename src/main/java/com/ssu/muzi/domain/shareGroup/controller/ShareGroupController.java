@@ -122,7 +122,7 @@ public class ShareGroupController {
             @Parameter(name = "size", description = "한 페이지에 나타낼 공유그룹 개수를 입력해주세요.")
     })
     public ResultResponse<ShareGroupResponse.PagedShareGroupInfo> getMyShareGroupList(@LoginMember Member member,
-                                                                                      @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC)
+                                                                                      @PageableDefault(size = 10, sort = "startedAt", direction = Sort.Direction.DESC)
                                                                                       @Parameter(hidden = true) Pageable pageable) {
         Page<ShareGroupResponse.ShareGroupPreviewInfo> shareGroupList = shareGroupService.getMyShareGroupList(member, pageable);
         return ResultResponse.of(ShareGroupResultCode.SHARE_GROUP_LIST_INFO,

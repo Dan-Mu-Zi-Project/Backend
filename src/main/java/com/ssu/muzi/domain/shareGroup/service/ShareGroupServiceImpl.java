@@ -224,53 +224,40 @@ public class ShareGroupServiceImpl implements ShareGroupService {
         Page<ShareGroup> groupPageIds = shareGroupRepository.findByIdIn(shareGroupIdList, pageable);
         LocalDateTime now = LocalDateTime.now();
 
-        // 3. 각 그룹마다, 내가 나온 내 앨범을 기준으로 해서, 전체 사진 수, 다운로드 수, 상태를 계산해서, 컨버터를 통해 응답으로 반환
-        List<ShareGroupResponse.ShareGroupPreviewInfo> groupPreviewList =
-                groupPageIds
-                        .getContent()
-                        .stream()
-                        .map(group -> {
 
-                // 해당 그룹에서 로그인한 사용자의 Profile id를 조회
-                Profile profile = profileService.findProfile(member.getId(), group.getId());
+        // 3. 계산 이후 컨버터로 반환
+        return groupPageIds.map(group -> {
+            Profile profile = profileService.findProfile(member.getId(), group.getId());
+            long entireCount   = photoProfileMapRepository.countByProfile(profile);
+            long downloadCount = photoDownloadLogRepository.countByProfile(profile);
 
-                // 전체 사진 수: 해당 Profile에 매핑된 PhotoProfileMap 엔티티 수
-                List<PhotoProfileMap> albumPhotos = photoProfileMapRepository.findByProfile(profile);
-                long entireCount = albumPhotos.size();
-
-                // 다운로드 수: 위에서 계산한, albumPhotos의 photo id 목록을 기반으로, PhotoDownloadLog에서 내 Profile의 다운로드 수 집계
-                // a. 위에서 계산한 albumPhotos의 photo id를 집계
-                List<Long> albumPhotoIds = albumPhotos
-                        .stream()
-                        .map(ppm -> ppm.getPhoto().getId())
-                        .collect(Collectors.toList());
-                // b. 다운로드 수 집계
-                long downloadCount = albumPhotoIds.isEmpty() ? 0 :
-                        photoDownloadLogRepository.countByProfileAndPhotoIdIn(profile, albumPhotoIds);
-
-                // 그룹 상태 계산
-                Status status = computeGroupStatus(group, now);
-
-                assert status != null;
-                return shareGroupConverter.toShareGroupPreview(group, status, downloadCount, entireCount);
-        }).collect(Collectors.toList());
-
-        // 4. PageImpl로 새로운 페이징된 그룹 리스트 생성
-        return new PageImpl<>(groupPreviewList, pageable, groupPageIds.getTotalElements());
+            Status status = computeGroupStatus(group, now);
+            return shareGroupConverter.toShareGroupPreview(
+                    group, status, downloadCount, entireCount);
+        });
     }
 
 
     // 현재 시간을 기준으로 그룹의 상태를 계산 (홈 화면 조회시)
     private Status computeGroupStatus(ShareGroup group, LocalDateTime now) {
-        if (now.isBefore(group.getStartedAt())) {
-            return Status.BEFORE_START;
-        } else if (!now.isAfter(group.getEndedAt())) { // now <= endedAt
-            return Status.IN_PROGRESS;
-        } else if (now.isBefore(group.getEndedAt().plusDays(7))) {
-            return Status.RECENTLY_ENDED;
-        } else {
+
+        LocalDateTime start = group.getStartedAt();
+        LocalDateTime end   = group.getEndedAt();
+
+        // start/end 가 null 이면 무조건 FINAL_ENDED 로 간주
+        if (start == null || end == null) {
             return Status.FINAL_ENDED;
         }
+        if (now.isBefore(start)) {
+            return Status.BEFORE_START;
+        }
+        if (!now.isAfter(end)) {            // now <= end
+            return Status.IN_PROGRESS;
+        }
+        if (now.isBefore(end.plusDays(7))) {
+            return Status.RECENTLY_ENDED;
+        }
+        return Status.FINAL_ENDED;
     }
 
     // 그룹 이미지 업로드
