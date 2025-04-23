@@ -241,7 +241,6 @@ public class ShareGroupServiceImpl implements ShareGroupService {
     // 현재 시간을 기준으로 그룹의 상태를 계산 (홈 화면 조회시)
     @Override
     public Status computeGroupStatus(ShareGroup group, LocalDateTime now) {
-        // .
 
         LocalDateTime start = group.getStartedAt();
         LocalDateTime end   = group.getEndedAt();
