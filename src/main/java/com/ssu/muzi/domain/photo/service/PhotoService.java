@@ -18,4 +18,5 @@ public interface PhotoService {
     PhotoResponse.PhotoDetailInfo getPhotoDetail(Long photoId);
     Page<PhotoResponse.PhotoPreviewInfo> getPhotoList(Member member, Long shareGroupId, Long albumProfileId, Pageable pageable);
     PhotoResponse.PhotoDeleteInfo deletePhotoList(PhotoRequest.PhotoDelete request);
+    Page<PhotoResponse.PhotoPreviewInfo> getPhotoFilterList(Member member, Long shareGroupId, List<Long> profileIds, Pageable pageable);
 }
