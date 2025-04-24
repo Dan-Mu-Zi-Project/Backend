@@ -25,7 +25,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 import static com.ssu.muzi.global.result.code.PhotoResultCode.CANCEL_LIKE;
 import static com.ssu.muzi.global.result.code.PhotoResultCode.PHOTO_DOWNLOAD;
@@ -86,6 +89,20 @@ public class GalleryController {
         Page<PhotoResponse.PhotoPreviewInfo> photoList = photoService.getPhotoList(member, shareGroupId, profileId, pageable);
         return ResultResponse.of(PhotoResultCode.PHOTO_LIST_INFO,
                 photoConverter.toPagedPhotoInfo(photoList, shareGroupId, profileId));
+    }
+
+    // 특정 Profile 리스트를 포함하는 사진 리스트 조회
+    @GetMapping("/{shareGroupId}/filter")
+    public ResultResponse<PhotoResponse.PagedPhotoFilterInfo> filterByProfiles(@LoginMember Member member,
+                                                                               @PathVariable Long shareGroupId,
+                                                                               @RequestParam List<Long> profileIdList,
+                                                                               @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC)
+                                                                                   @Parameter(hidden = true) Pageable pageable) {
+
+        Page<PhotoResponse.PhotoPreviewInfo> photoList = photoService.getPhotoFilterList(member, shareGroupId, profileIdList,pageable);
+
+        return ResultResponse.of(PhotoResultCode.PHOTO_LIST_INFO,
+                photoConverter.toPagedPhotoFilterInfo(photoList, shareGroupId));
     }
 
 

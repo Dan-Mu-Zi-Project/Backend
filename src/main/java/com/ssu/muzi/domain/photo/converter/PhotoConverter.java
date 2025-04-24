@@ -163,6 +163,19 @@ public class PhotoConverter {
                 .build();
     }
 
+    // 특정 프로필 리스트가 포함된 사진 리스트 응답 시, 최종 응답용 PagedPhoto DTO로 변환
+    public PhotoResponse.PagedPhotoFilterInfo toPagedPhotoFilterInfo(Page<PhotoResponse.PhotoPreviewInfo> dtoPage, Long shareGroupId) {
+        return PhotoResponse.PagedPhotoFilterInfo
+                .builder()
+                .shareGroupId(shareGroupId)
+                .photoPreviewList(dtoPage.getContent())
+                .page(dtoPage.getTotalPages())
+                .totalElements(dtoPage.getTotalElements())
+                .isFirst(dtoPage.isFirst())
+                .isLast(dtoPage.isLast())
+                .build();
+    }
+
     // 사진 삭제 시, 삭제 개수 반환
     public PhotoResponse.PhotoDeleteInfo toPhotoDeleteInfo(int deletedCount) {
         return PhotoResponse.PhotoDeleteInfo

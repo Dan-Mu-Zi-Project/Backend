@@ -288,6 +288,24 @@ public class PhotoServiceImpl implements PhotoService {
         });
     }
 
+    // 특정 profileIdList가 포함된 모든 사진 리스트를 조회
+    @Override
+    public Page<PhotoResponse.PhotoPreviewInfo> getPhotoFilterList(Member member, Long shareGroupId, List<Long> profileIds, Pageable pageable) {
+
+        // 1) 해당 조건으로 Photo 엔티티 페이징 조회
+        Page<Photo> photos = photoRepository.findByAllProfileIds(profileIds, pageable);
+
+        // 2) 조회자(내 member)의 해당 그룹 내 프로필
+        Profile myProfile = profileService.findProfile(member.getId(), shareGroupId);
+
+        // 3) 각 사진마다, 내 프로필 기준 좋아요 및 다운로드 여부를 체크하여 DTO로 변환
+        return photos.map(photo -> {
+            boolean isLikedByUser = photoLikeRepository.existsByProfileAndPhoto(myProfile, photo);
+            boolean isDownloadedByUser = photoDownloadLogRepository.existsByProfileAndPhoto(myProfile, photo);
+            return photoConverter.toPhotoPreview(photo, isLikedByUser, isDownloadedByUser);
+        });
+    }
+
     // 사진 삭제
     @Override
     public PhotoResponse.PhotoDeleteInfo deletePhotoList(PhotoRequest.PhotoDelete request) {
