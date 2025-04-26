@@ -404,5 +404,5 @@ public class ShareGroupServiceImpl implements ShareGroupService {
     private boolean doesProfileExist(Long shareGroupId, Long memberId) {
         return profileRepository.existsByShareGroupIdAndMemberId(shareGroupId, memberId);
     }
-
+//
 }
