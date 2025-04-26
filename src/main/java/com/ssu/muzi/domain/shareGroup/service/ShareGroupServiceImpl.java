@@ -184,6 +184,7 @@ public class ShareGroupServiceImpl implements ShareGroupService {
 
     // 홈 화면 반환
     @Override
+    @Transactional(readOnly = true)
     public ShareGroupResponse.Home getHomeGroups(Member member) {
 
         // 현재 시간 기준
@@ -197,7 +198,7 @@ public class ShareGroupServiceImpl implements ShareGroupService {
                 .stream()
                 .map(group -> {
                     Status status = computeGroupStatus(group, now);
-                    return status == Status.FINAL_ENDED ? null : shareGroupConverter.toHomeDetail(group, status);
+                    return status.name().equals(Status.FINAL_ENDED.name()) ? null : shareGroupConverter.toHomeDetail(group, status);
                 })
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());

@@ -39,6 +39,7 @@ import java.util.stream.Collectors;
 
 import static com.ssu.muzi.global.error.code.PhotoErrorCode.ALREADY_LIKED;
 import static com.ssu.muzi.global.error.code.PhotoErrorCode.NOT_LIKED;
+import static com.ssu.muzi.global.error.code.PhotoErrorCode.PHOTO_NOT_ENOUGH;
 import static com.ssu.muzi.global.error.code.PhotoErrorCode.PHOTO_NOT_FOUND;
 
 @Service
@@ -304,6 +305,29 @@ public class PhotoServiceImpl implements PhotoService {
             boolean isDownloadedByUser = photoDownloadLogRepository.existsByProfileAndPhoto(myProfile, photo);
             return photoConverter.toPhotoPreview(photo, isLikedByUser, isDownloadedByUser);
         });
+    }
+
+    // 8개 사진 랜덤 조회
+    @Override
+    @Transactional(readOnly = true)
+    public List<PhotoResponse.RandomPhotoPreviewInfo> getRandomPhotos(Long shareGroupId) {
+
+        // 1. 해당 그룹의 전체 사진 개수 세기
+        long photoCount = photoRepository.countDistinctByShareGroupId(shareGroupId);
+
+        // 2. 8개 미만이면 에러 발생
+        if (photoCount < 8) {
+            throw new BusinessException(PHOTO_NOT_ENOUGH);
+        }
+
+        // 3. 랜덤으로 8개 사진만 조회
+        List<Photo> randomPhotos = photoRepository.findRandom8ByShareGroupId(shareGroupId);
+
+        // 4. 조회된 Photo들을 RandomPhotoPreviewInfo로 변환
+        return randomPhotos
+                .stream()
+                .map(photoConverter::toRandomPhotoPreview)
+                .collect(Collectors.toList());
     }
 
     // 사진 삭제

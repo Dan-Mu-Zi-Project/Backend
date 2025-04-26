@@ -149,6 +149,17 @@ public class PhotoConverter {
                 .build();
     }
 
+    // 랜덤 photo를 위한 사진 정보 반환
+    public PhotoResponse.RandomPhotoPreviewInfo toRandomPhotoPreview(Photo photo) {
+        return PhotoResponse.RandomPhotoPreviewInfo
+                .builder()
+                .photoId(photo.getId())
+                .photoUrl(photo.getPhotoUrl())
+                .width(photo.getWidth())
+                .height(photo.getHeight())
+                .build();
+    }
+
     // 특정 앨범의 사진 리스트 응답 시, 최종 응답용 PagedPhoto DTO로 변환
     public PhotoResponse.PagedPhotoInfo toPagedPhotoInfo(Page<PhotoResponse.PhotoPreviewInfo> dtoPage, Long shareGroupId, Long albumProfileId) {
         return PhotoResponse.PagedPhotoInfo

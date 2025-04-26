@@ -43,4 +43,18 @@ public interface PhotoRepository extends JpaRepository<Photo, Long> {
             @Param("profileIds") List<Long> profileIds,
             Pageable pageable
     );
+
+    // 그룹에 얽힌 전체 사진수 세기
+    @Query("SELECT COUNT(DISTINCT p) FROM Photo p " +
+            "JOIN PhotoProfileMap ppm ON ppm.photo = p " +
+            "WHERE ppm.profile.shareGroup.id = :shareGroupId")
+    long countDistinctByShareGroupId(@Param("shareGroupId") Long shareGroupId);
+
+    // 8개 랜덤 ㅅ자ㅣㄴ 불러오기
+    @Query(value = "SELECT DISTINCT p.* FROM photo p " +
+            "JOIN photo_profile_map ppm ON ppm.photo_id = p.photo_id " +
+            "JOIN profile pr ON ppm.profile_id = pr.profile_id " +
+            "WHERE pr.share_group_id = :shareGroupId " +
+            "ORDER BY RAND() LIMIT 8", nativeQuery = true)
+    List<Photo> findRandom8ByShareGroupId(@Param("shareGroupId") Long shareGroupId);
 }

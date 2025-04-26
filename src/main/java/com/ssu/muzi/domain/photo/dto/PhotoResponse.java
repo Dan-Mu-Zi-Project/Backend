@@ -114,6 +114,18 @@ public abstract class PhotoResponse {
         private Integer height;
     }
 
+    // 랜덤 사진 조회 시, 사진 응답
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class RandomPhotoPreviewInfo {
+        private Long photoId;
+        private String photoUrl;
+        private Integer width;
+        private Integer height;
+    }
+
     // 사진 id를 응답
     @Getter
     @Builder
