@@ -404,4 +404,5 @@ public class ShareGroupServiceImpl implements ShareGroupService {
     private boolean doesProfileExist(Long shareGroupId, Long memberId) {
         return profileRepository.existsByShareGroupIdAndMemberId(shareGroupId, memberId);
     }
+ // 메모리 늘렸잖아 왜 배포 안돼
 }
