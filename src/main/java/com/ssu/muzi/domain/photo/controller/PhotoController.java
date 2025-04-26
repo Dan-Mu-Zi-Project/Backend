@@ -73,4 +73,11 @@ public class PhotoController {
                 photoService.deletePhotoList(request));
     }
 
+    @GetMapping("/{shareGroupId}/random")
+    @Operation(summary = "공유 그룹 랜덤 사진 8개 조회 API",
+            description = "특정 공유 그룹에 업로드된 사진 중 랜덤 8개를 조회합니다.")
+    public ResultResponse<List<PhotoResponse.RandomPhotoPreviewInfo>> getRandomPhotos(@PathVariable Long shareGroupId) {
+        return ResultResponse.of(PhotoResultCode.PHOTO_RANDOM_LIST,
+                photoService.getRandomPhotos(shareGroupId));
+    }
 }
