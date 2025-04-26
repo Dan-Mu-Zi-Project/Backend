@@ -198,7 +198,7 @@ public class ShareGroupServiceImpl implements ShareGroupService {
                 .stream()
                 .map(group -> {
                     Status status = computeGroupStatus(group, now);
-                    return status.name().equals(Status.FINAL_ENDED.name()) ? null : shareGroupConverter.toHomeDetail(group, status);
+                    return status == Status.FINAL_ENDED ? null : shareGroupConverter.toHomeDetail(group, status);
                 })
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
